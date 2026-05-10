@@ -19,6 +19,6 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('ays-mfa-account');
-    expect(compiled.querySelector('p')?.textContent).toContain('Micro-frontend loaded successfully.');
+    expect(compiled.querySelector('p')?.textContent).toContain('Micro-frontend loaded successfully realtime changes.');
   });
 });
