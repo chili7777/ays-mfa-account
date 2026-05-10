@@ -14,10 +14,11 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('should render micro-frontend title and message', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, ays-mfa-account');
+    expect(compiled.querySelector('h1')?.textContent).toContain('ays-mfa-account');
+    expect(compiled.querySelector('p')?.textContent).toContain('Micro-frontend loaded successfully.');
   });
 });
