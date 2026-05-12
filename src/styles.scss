@@ -406,15 +406,31 @@ input:checked + .slider {
 .shadow-sm { box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important; }
 .border-dashed { border-style: dashed !important; }
 
-/* Responsive display */
-.show-mobile-only { display: block; }
-.hide-mobile { display: none; }
+/* Responsive display utilities */
+.d-none { display: none !important; }
+.d-inline { display: inline !important; }
+.d-flex { display: flex !important; }
+.show-mobile-only { display: block !important; }
+.hide-mobile { display: none !important; }
 
 @media (min-width: 768px) {
-  .show-mobile-only { display: none; }
-  .hide-mobile { display: block; }
-  .d-lg-inline { display: inline; }
-  .d-lg-none { display: none; }
+  .show-mobile-only { display: none !important; }
+  .hide-mobile { display: block !important; }
+}
+
+@media (min-width: 992px) {
+  .d-lg-inline { display: inline !important; }
+  .d-lg-none { display: none !important; }
+}
+
+@media (min-width: 1200px) {
+  .d-xl-inline { display: inline !important; }
+  .d-xl-none { display: none !important; }
+}
+
+@media (min-width: 1400px) {
+  .d-xxl-inline { display: inline !important; }
+  .d-xxl-none { display: none !important; }
 }
 
 /* Empty State */
