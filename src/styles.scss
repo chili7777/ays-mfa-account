@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
   background-color: $theme-dark-bg;
@@ -12,6 +12,13 @@ body {
   font-family: $font-family-primary;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+
+  /* Ocultar barra de desplazamiento pero permitir scroll */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE y Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari y Opera */
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
