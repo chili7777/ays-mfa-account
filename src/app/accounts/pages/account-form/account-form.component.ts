@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -23,12 +23,16 @@ export class AccountFormComponent implements OnInit {
   accountForm: FormGroup;
   isEdit = false;
   accountId: string | null = null;
-  customers: Customer[] = [];
+  customers = signal<Customer[]>([]);
+  currentStep = signal<number>(1);
+  totalSteps = 3;
+
+  get f() { return this.accountForm.controls; }
 
   constructor() {
     this.accountForm = this.fb.group({
       clientId: ['', [Validators.required]],
-      accountNumber: ['', [Validators.required]],
+      accountNumber: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       accountType: ['SAVINGS', [Validators.required]],
       initialBalance: [0, [Validators.required, Validators.min(0)]],
       status: [true]
@@ -37,9 +41,7 @@ export class AccountFormComponent implements OnInit {
 
   loadCustomers(): void {
     this.customerService.getCustomers().subscribe({
-      next: (customers) => {
-        this.customers = customers;
-      },
+      next: (data) => this.customers.set(data),
       error: (err) => console.error('Error al cargar clientes', err)
     });
   }
@@ -49,7 +51,7 @@ export class AccountFormComponent implements OnInit {
     this.accountId = this.route.snapshot.paramMap.get('id');
     if (this.accountId) {
       this.isEdit = true;
-      // En modo edición, deshabilitar campos que no se pueden editar según CURL
+      // En modo edición, algunos campos suelen ser inmutables en sistemas bancarios
       this.accountForm.get('clientId')?.disable();
       this.accountForm.get('accountNumber')?.disable();
       this.accountForm.get('initialBalance')?.disable();
@@ -80,49 +82,86 @@ export class AccountFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.accountForm.invalid) return;
+    if (this.accountForm.invalid) {
+      this.accountForm.markAllAsTouched();
+      alert('Por favor, complete todos los campos requeridos correctamente.');
+      return;
+    }
 
     const formValue = this.accountForm.getRawValue();
 
     if (this.isEdit) {
-      const isOnlyTypeChanged =
-        formValue.accountType !== this.originalAccount?.accountType &&
-        formValue.status === this.originalAccount?.status;
-
       const updateData = {
         accountType: formValue.accountType,
         status: formValue.status
       };
 
-      if (isOnlyTypeChanged) {
-        this.accountService.patchAccount({ accountType: formValue.accountType }, this.accountId!).subscribe({
-          next: () => {
-            alert('Tipo de cuenta actualizado correctamente');
-            this.goBack();
-          },
-          error: (err) => alert('Error al actualizar el tipo de cuenta')
-        });
-      } else {
-        this.accountService.updateAccount(updateData, this.accountId!).subscribe({
-          next: () => {
-            alert('Cuenta actualizada correctamente');
-            this.goBack();
-          },
-          error: (err) => alert('Error al actualizar la cuenta')
-        });
-      }
+      this.accountService.updateAccount(updateData, this.accountId!).subscribe({
+        next: () => {
+          alert('Cuenta actualizada correctamente');
+          this.goBack();
+        },
+        error: (err) => {
+          console.error('Error al actualizar', err);
+          alert('Error al actualizar la cuenta');
+        }
+      });
     } else {
       this.accountService.createAccount(formValue).subscribe({
         next: () => {
           alert('Cuenta creada correctamente');
           this.goBack();
         },
-        error: (err) => alert('Error al crear la cuenta')
+        error: (err) => {
+          console.error('Error al crear', err);
+          alert('Error al crear la cuenta');
+        }
       });
     }
   }
 
   goBack(): void {
     this.router.navigate(['/accounts']);
+  }
+
+  nextStep(): void {
+    if (this.isStepValid()) {
+      if (this.currentStep() < this.totalSteps) {
+        this.currentStep.update(s => s + 1);
+      }
+    } else {
+      this.markStepAsTouched();
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep() > 1) {
+      this.currentStep.update(s => s - 1);
+    }
+  }
+
+  isStepValid(): boolean {
+    const step = this.currentStep();
+    if (step === 1) {
+      return (this.accountForm.get('clientId')?.valid ?? false) &&
+             (this.accountForm.get('accountNumber')?.valid ?? false);
+    }
+    if (step === 2) {
+      return (this.accountForm.get('accountType')?.valid ?? false) &&
+             (this.accountForm.get('initialBalance')?.valid ?? false);
+    }
+    return true;
+  }
+
+  markStepAsTouched(): void {
+    const step = this.currentStep();
+    if (step === 1) {
+      this.accountForm.get('clientId')?.markAsTouched();
+      this.accountForm.get('accountNumber')?.markAsTouched();
+    }
+    if (step === 2) {
+      this.accountForm.get('accountType')?.markAsTouched();
+      this.accountForm.get('initialBalance')?.markAsTouched();
+    }
   }
 }

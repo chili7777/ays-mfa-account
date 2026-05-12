@@ -1,79 +1,146 @@
-<div class="container py-4">
-  <header class="mb-4 px-2">
-    <h1 class="h4 mb-0">{{isEdit ? 'Editar Cuenta' : 'Nueva Cuenta'}}</h1>
-  </header>
+<div class="container py-4 d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+  <div class="w-100 animate-fade-in" style="max-width: 500px;">
+    <header class="mb-5 text-center mt-4">
+      <div class="d-inline-flex p-3 rounded-circle mb-3" style="color: var(--accent-color);">
+        <span class="material-icons" style="font-size: 32px;">account_balance</span>
+      </div>
+      <h1 class="h3 mb-2 fw-bold">{{isEdit ? 'Actualizar Cuenta' : 'Apertura de Cuenta'}}</h1>
+      <p class="text-secondary px-4">
+        {{
+          currentStep() === 1 ? 'Paso 1: Vínculo con Cliente' :
+          currentStep() === 2 ? 'Paso 2: Detalles Bancarios' : 'Paso 3: Estado y Activación'
+        }}
+      </p>
 
-  <div class="surface-alt mx-2">
-    <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
-      <div class="row">
-        <div class="col-12 col-md-6 mb-4">
-          <label class="form-label d-block text-secondary small mb-2">Cliente</label>
-          <select
-            formControlName="clientId"
-            class="form-control"
-          >
-            <option value="" disabled selected>Seleccione un cliente</option>
-            <option *ngFor="let customer of customers" [value]="customer.id">
-              {{customer.name}} ({{customer.identification}})
-            </option>
-          </select>
-        </div>
-
-        <div class="col-12 col-md-6 mb-4">
-          <label class="form-label d-block text-secondary small mb-2">Número de Cuenta</label>
-          <input
-            type="text"
-            formControlName="accountNumber"
-            class="form-control"
-            placeholder="Ej: 1234567890"
-          >
-        </div>
-
-        <div class="col-12 col-md-6 mb-4">
-          <label class="form-label d-block text-secondary small mb-2">Tipo de Cuenta</label>
-          <select
-            formControlName="accountType"
-            class="form-control"
-          >
-            <option value="SAVINGS">Ahorros (SAVINGS)</option>
-            <option value="CURRENT">Corriente (CURRENT)</option>
-          </select>
-        </div>
-
-        <div class="col-12 col-md-6 mb-4">
-          <label class="form-label d-block text-secondary small mb-2">Saldo Inicial</label>
-          <input
-            type="number"
-            formControlName="initialBalance"
-            class="form-control"
-            placeholder="0.00"
-          >
+      <!-- Progress Indicators (Dots style like customer) -->
+      <div class="d-flex gap-2 mt-4 justify-content-center">
+        <div *ngFor="let s of [1,2,3]"
+             class="stepper-dot"
+             [class.active]="s === currentStep()"
+             [class.completed]="s < currentStep()">
         </div>
       </div>
+    </header>
 
-      <div class="mb-4 d-flex align-items-center justify-content-between py-3" style="border-top: 1px solid var(--border-color, rgba(43, 49, 57, 0.5)); border-bottom: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
-        <div>
-          <label for="status" class="form-label mb-0 d-block">Estado de la cuenta</label>
-          <span class="text-secondary small">Define si la cuenta estará activa inmediatamente</span>
+    <div class="surface-alt p-4 shadow-sm">
+      <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+
+        <!-- PASO 1: Cliente y Número -->
+        <div *ngIf="currentStep() === 1" class="step-content animate-fade-in">
+          <div class="mb-4">
+            <label class="text-secondary small d-block mb-2">Cliente Titular</label>
+            <select
+              formControlName="clientId"
+              class="form-control"
+              [class.is-invalid]="f['clientId'].invalid && f['clientId'].touched"
+            >
+              <option value="" disabled selected>Seleccione un cliente</option>
+              <option *ngFor="let customer of customers()" [value]="customer.id">
+                {{customer.name}} ({{customer.identification}})
+              </option>
+            </select>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['clientId'].errors?.['required'] && f['clientId'].touched">
+              Debe seleccionar un cliente
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="text-secondary small d-block mb-2">Número de Cuenta</label>
+            <input
+              type="text"
+              formControlName="accountNumber"
+              class="form-control"
+              [class.is-invalid]="f['accountNumber'].invalid && f['accountNumber'].touched"
+              placeholder="Ej: 1234567890"
+            >
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['required'] && f['accountNumber'].touched">
+              El número de cuenta es requerido
+            </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['pattern'] && f['accountNumber'].touched">
+              Debe ser solo números
+            </div>
+          </div>
         </div>
-        <label class="switch">
-          <input
-            type="checkbox"
-            id="status"
-            formControlName="status"
-          >
-          <span class="slider"></span>
-        </label>
-      </div>
 
-      <div class="mt-5 d-flex gap-3">
-        <button type="submit" class="btn btn-lg w-100" [ngClass]="isEdit ? 'btn-warning' : 'btn-success'" [disabled]="accountForm.invalid">
-          {{isEdit ? 'Actualizar Cuenta' : 'Crear Cuenta'}}
-        </button>
-        <button type="button" class="btn btn-secondary w-100" (click)="goBack()">
-          Cancelar
-        </button>
-      </div>
-    </form>
+        <!-- PASO 2: Tipo y Saldo -->
+        <div *ngIf="currentStep() === 2" class="step-content animate-fade-in">
+          <div class="mb-4">
+            <label class="text-secondary small d-block mb-2">Tipo de Cuenta</label>
+            <select
+              formControlName="accountType"
+              class="form-control"
+              [class.is-invalid]="f['accountType'].invalid && f['accountType'].touched"
+            >
+              <option value="SAVINGS">Ahorros (SAVINGS)</option>
+              <option value="CURRENT">Corriente (CURRENT)</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="text-secondary small d-block mb-2">Saldo Inicial</label>
+            <div class="position-relative">
+              <span class="position-absolute top-50 translate-middle-y ms-2 text-secondary fw-bold">$</span>
+              <input
+                type="number"
+                formControlName="initialBalance"
+                class="form-control ps-4"
+                [class.is-invalid]="f['initialBalance'].invalid && f['initialBalance'].touched"
+                placeholder="0.00"
+              >
+            </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['initialBalance'].errors?.['required'] && f['initialBalance'].touched">
+              Saldo inicial es requerido
+            </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['initialBalance'].errors?.['min'] && f['initialBalance'].touched">
+              El saldo no puede ser negativo
+            </div>
+          </div>
+        </div>
+
+        <!-- PASO 3: Estado -->
+        <div *ngIf="currentStep() === 3" class="step-content animate-fade-in">
+          <div class="mb-4 d-flex align-items-center justify-content-between py-3 surface-alt px-3 rounded">
+            <div>
+              <label for="status" class="fw-medium d-block mb-0">Estado: {{ f['status'].value ? 'Activa' : 'Inactiva' }}</label>
+              <span class="text-secondary small">
+                {{ f['status'].value ? 'Operativa para transacciones' : 'Deshabilitada temporalmente' }}
+              </span>
+            </div>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="status"
+                formControlName="status"
+              >
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="surface p-3 border-dashed rounded text-center" style="border: 1px dashed rgba(255,255,255,0.1);">
+            <p class="text-secondary small mb-0">
+              Verifique que toda la información sea correcta antes de proceder.
+            </p>
+          </div>
+        </div>
+
+        <!-- Navigation (Same style as customer) -->
+        <div class="mt-5 d-flex gap-3">
+          <button type="button" class="btn btn-secondary flex-grow-1" (click)="currentStep() === 1 ? goBack() : prevStep()">
+            <span class="material-icons d-lg-none" style="font-size: 18px;">{{currentStep() === 1 ? 'close' : 'arrow_back'}}</span>
+            <span class="d-none d-lg-inline">{{currentStep() === 1 ? 'Cancelar' : 'Anterior'}}</span>
+          </button>
+
+          <button *ngIf="currentStep() < totalSteps" type="button" class="btn btn-primary flex-grow-1" (click)="nextStep()">
+            <span class="material-icons d-lg-none" style="font-size: 18px;">arrow_forward</span>
+            <span class="d-none d-lg-inline">Siguiente</span>
+          </button>
+
+          <button *ngIf="currentStep() === totalSteps" type="submit" class="btn flex-grow-1" [ngClass]="isEdit ? 'btn-warning' : 'btn-success'" [disabled]="accountForm.invalid">
+            <span class="material-icons d-lg-none" style="font-size: 18px;">{{isEdit ? 'save' : 'check'}}</span>
+            <span class="d-none d-lg-inline">{{isEdit ? 'Guardar Cambios' : 'Confirmar Apertura'}}</span>
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

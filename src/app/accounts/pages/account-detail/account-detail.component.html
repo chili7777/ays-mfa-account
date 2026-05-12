@@ -1,78 +1,138 @@
-<div class="container py-4">
-  <header class="mb-4 d-flex align-items-center gap-3 px-2">
-    <button class="btn btn-secondary btn-sm" (click)="goBack()" title="Volver">←</button>
-    <h1 class="h4 mb-0">Detalle de Cuenta</h1>
-  </header>
+<div class="container py-4 d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+  <div class="w-100 animate-fade-in position-relative" style="max-width: 500px;">
 
-  @if (loading()) {
-    <div class="text-center py-5">
-      <p class="text-secondary">Cargando información...</p>
+    <!-- Botón Volver - Escritorio (Posición absoluta lateral) -->
+    <button class="btn btn-icon position-absolute d-none d-lg-block" style="top: 1.5rem; left: -3rem;" (click)="goBack()" title="Volver">
+      <span class="material-icons">arrow_back</span>
+    </button>
+
+    <!-- Botón Volver - Móvil/Tablet (Dentro del flujo) -->
+    <div class="d-lg-none mb-3">
+      <button class="btn btn-icon" (click)="goBack()" title="Volver">
+        <span class="material-icons">arrow_back</span>
+      </button>
     </div>
-  } @else if (errorMessage()) {
-    <div class="surface mx-2 text-center py-5">
-      <div class="text-danger mb-3">
-        {{errorMessage()}}
+
+    <header class="mb-5 text-center mt-4">
+      <div class="d-inline-flex p-3 rounded-circle mb-3" style="color: var(--accent-color);">
+        <span class="material-icons" style="font-size: 32px;">account_balance</span>
       </div>
-      <button class="btn btn-secondary" (click)="goBack()">Volver al listado</button>
-    </div>
-  } @else if (account(); as acc) {
-    <div class="surface mx-2">
-      <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
-        <div>
-          <span class="text-secondary small d-block">Número de Cuenta</span>
-          <span class="h5 mb-0">{{acc.accountNumber}}</span>
+      <h1 class="h3 mb-2 fw-bold">Detalle de Cuenta</h1>
+      <p class="text-secondary px-4 mb-3">
+        {{ account()?.accountNumber || 'Información detallada' }}
+      </p>
+
+      @if (account(); as acc) {
+        <div class="d-flex justify-content-center align-items-center gap-3 animate-fade-in mb-2">
+          <span [class]="acc.status ? 'status-dot active' : 'status-dot'"></span>
+          <span class="fw-medium small" [style.color]="acc.status ? '#00c076' : '#d41020'">
+            {{ acc.status ? 'Cuenta Activa' : 'Cuenta Inactiva' }}
+          </span>
+          <label class="switch" style="transform: scale(0.8);" [title]="acc.status ? 'Desactivar cuenta' : 'Activar cuenta'">
+            <input type="checkbox" [checked]="acc.status" (change)="toggleStatus()">
+            <span class="slider"></span>
+          </label>
         </div>
-        <span class="status-badge" [ngClass]="acc.status ? 'status-active' : 'status-inactive'">
-          {{acc.status ? 'Activa' : 'Inactiva'}}
-        </span>
-      </div>
+      }
+    </header>
 
-      <div class="row g-4">
+    @if (loading()) {
+      <div class="surface-alt p-5 shadow-sm text-center">
+        <div class="modern-loader mx-auto mb-4">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="core"></div>
+        </div>
+        <p class="loading-text mb-0">Obteniendo datos...</p>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="surface-alt p-5 shadow-sm text-center">
+        <div class="empty-icon-container mx-auto mb-4" style="border-color: rgba(212, 16, 32, 0.2); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid;">
+          <span class="material-icons text-danger" style="font-size: 40px;">warning</span>
+        </div>
+        <h3 class="text-danger h5 mb-2">Aviso del Sistema</h3>
+        <p class="text-secondary small mb-4">{{errorMessage()}}</p>
+        <button class="btn btn-secondary w-100" (click)="goBack()">
+          Volver al listado
+        </button>
+      </div>
+    } @else if (account(); as acc) {
+      <div class="surface-alt p-4 shadow-sm">
         <div class="mb-4">
-          <label class="text-secondary small d-block mb-1">Cliente</label>
+          <label class="text-secondary small d-flex align-items-center gap-2 mb-2">
+            <span class="material-icons" style="font-size: 14px; opacity: 0.5;">numbers</span>
+            Número de Cuenta
+          </label>
+          <div class="form-control" style="border-bottom-color: rgba(43, 49, 57, 0.3);">{{acc.accountNumber}}</div>
+        </div>
+
+        <div class="mb-4">
+          <label class="text-secondary small d-flex align-items-center gap-2 mb-2">
+            <span class="material-icons" style="font-size: 14px; opacity: 0.5;">person</span>
+            Cliente Titular
+          </label>
           @if (customer(); as c) {
-            <div class="fw-medium">{{c.name}}</div>
-            <div class="text-secondary small">{{c.identification}} | {{c.email}}</div>
+            <div class="form-control" style="border-bottom-color: rgba(43, 49, 57, 0.3);">
+              {{c.name}} ({{c.identification}})
+            </div>
           } @else {
-            <span class="fw-medium">{{acc.clientId}}</span>
+            <div class="form-control text-secondary" style="border-bottom-color: rgba(43, 49, 57, 0.3);">
+              ID: {{acc.clientId}}
+            </div>
           }
         </div>
-        <div class="mb-4">
-          <label class="text-secondary small d-block mb-1">Tipo de Cuenta</label>
-          <span class="fw-medium">{{acc.accountType}}</span>
-        </div>
-        <div class="mb-4">
-          <label class="text-secondary small d-block mb-1">Saldo Inicial</label>
-          <span class="fw-medium h5">{{acc.initialBalance | currency}}</span>
-        </div>
-      </div>
 
-      <div class="mt-4 pt-4 d-flex flex-column gap-3" style="border-top: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
-        <div class="d-flex gap-2">
-          <button class="btn btn-warning w-100" (click)="goToEdit()">Editar</button>
-          <button class="btn btn-secondary w-100" (click)="toggleStatus()">
-            {{acc.status ? 'Desactivar' : 'Activar'}}
+        <div class="row">
+          <div class="col-6 mb-4">
+            <label class="text-secondary small d-flex align-items-center gap-2 mb-2">
+              <span class="material-icons" style="font-size: 14px; opacity: 0.5;">account_balance</span>
+              Tipo
+            </label>
+            <div class="form-control" style="border-bottom-color: rgba(43, 49, 57, 0.3);">
+              {{acc.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}}
+            </div>
+          </div>
+          <div class="col-6 mb-4">
+            <label class="text-secondary small d-flex align-items-center gap-2 mb-2">
+              <span class="material-icons" style="font-size: 14px; opacity: 0.5;">payments</span>
+              Saldo
+            </label>
+            <div class="form-control fw-bold" style="border-bottom-color: rgba(43, 49, 57, 0.3); color: var(--accent-color);">
+              {{acc.initialBalance | currency}}
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 d-flex gap-3">
+          <button class="btn btn-warning flex-grow-1" (click)="goToEdit()">
+            <span class="material-icons" style="font-size: 18px;">edit</span>
+            <span class="d-none d-lg-inline">Editar</span>
+          </button>
+          <button class="btn btn-danger flex-grow-1" (click)="confirmDelete(acc.id)">
+            <span class="material-icons" style="font-size: 18px;">delete</span>
+            <span class="d-none d-lg-inline">Eliminar</span>
           </button>
         </div>
-        <button class="btn btn-danger w-100" (click)="confirmDelete(acc.id)">Eliminar Cuenta</button>
       </div>
-    </div>
-  } @else {
-    <div class="text-center py-5">
-      <p class="text-secondary">No se encontró información de la cuenta.</p>
-      <button class="btn btn-secondary" (click)="goBack()">Volver al listado</button>
-    </div>
-  }
+    }
+  </div>
 </div>
 
 <!-- Modal de Eliminación - Estilo Surface -->
-<div *ngIf="showDeleteModal()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-  <div class="surface mx-3" style="width: 100%; max-width: 400px;">
-    <h3 class="h5 mb-3">Eliminar cuenta</h3>
-    <p class="text-secondary mb-4">¿Estás seguro de que deseas eliminar esta cuenta permanentemente?</p>
-    <div class="d-flex justify-content-end gap-2">
-      <button class="btn btn-secondary" (click)="showDeleteModal.set(false)">Cancelar</button>
-      <button class="btn btn-danger" (click)="onDelete()">Eliminar</button>
+<div *ngIf="showDeleteModal()" class="animate-fade-in" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
+  <div class="surface-alt p-4 mx-3 w-100 shadow-lg" style="max-width: 400px; border-radius: 12px;">
+    <div class="text-center mb-4">
+      <div class="d-inline-flex p-3 rounded-circle mb-3" style="color: var(--error-color); background: rgba(212, 16, 32, 0.1);">
+        <span class="material-icons" style="font-size: 32px;">warning</span>
+      </div>
+      <h3 class="h5 fw-bold mb-2">Eliminar cuenta</h3>
+      <p class="text-secondary small">¿Estás seguro de que deseas eliminar esta cuenta? Esta acción verificará primero si existen movimientos asociados.</p>
+    </div>
+
+    <div class="d-flex gap-3">
+      <button class="btn btn-secondary flex-grow-1" (click)="showDeleteModal.set(false)">Cancelar</button>
+      <button class="btn btn-danger flex-grow-1" (click)="onDelete()">Eliminar</button>
     </div>
   </div>
 </div>

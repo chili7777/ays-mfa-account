@@ -1,103 +1,143 @@
-<div class="container">
-  <!-- Section Búsqueda - Minimalista -->
-  <section class="search-section py-4">
-    <div class="d-flex gap-2">
-      <div class="position-relative w-100">
-        <span class="material-icons position-absolute top-50 translate-middle-y ms-3 text-secondary" style="font-size: 18px;">search</span>
-        <input
-          type="text"
-          class="form-control ps-5"
-          placeholder="Buscar cuenta..."
-          [(ngModel)]="searchTerm"
-          (keyup.enter)="onSearch()"
-        >
+<div class="container py-4">
+  <div class="desktop-card shadow-sm animate-fade-in">
+    <!-- Section Búsqueda - Minimalista (Consistente con customer) -->
+    <section class="search-section mb-4">
+      <div class="d-flex gap-2">
+        <div class="position-relative w-100">
+          <span class="material-icons position-absolute top-50 translate-middle-y ms-3 text-secondary" style="font-size: 18px;">search</span>
+          <input
+            type="text"
+            class="form-control ps-5"
+            placeholder="Buscar cuenta (número, tipo o cliente)..."
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)"
+            (keyup.enter)="onSearch()"
+          >
+        </div>
+        <button class="btn btn-primary" type="button" (click)="onSearch()">
+          <span class="material-icons d-lg-none">search</span>
+          <span class="d-none d-lg-inline">Buscar</span>
+        </button>
       </div>
-      <button class="btn btn-primary" type="button" (click)="onSearch()">
-        Buscar
-      </button>
-    </div>
-  </section>
+    </section>
 
-  <section class="list-section">
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
-      <h2 class="h5 mb-0">Cuentas</h2>
-      <button class="btn btn-success btn-sm" (click)="goToCreate()">
-        + Nueva
-      </button>
-    </div>
+    <section class="list-section">
+      <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <h2 class="h5 mb-0">Cuentas</h2>
+        <button class="btn btn-success btn-sm" (click)="goToCreate()">
+          <span class="material-icons d-lg-none" style="font-size: 18px;">add</span>
+          <span class="d-none d-lg-inline">+ Nueva</span>
+        </button>
+      </div>
 
-    <!-- Vista de Móvil: Lista minimalista -->
-    <div class="show-mobile-only">
-      <div class="px-3" *ngFor="let account of filteredAccounts" (click)="goToDetail(account.id)">
-        <div class="py-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
-          <div>
-            <div class="d-flex align-items-center gap-2">
-              <span class="fw-bold">{{account.accountNumber}}</span>
-              <span class="status-badge" [ngClass]="account.status ? 'status-active' : 'status-inactive'">
-                •
-              </span>
+      <div *ngIf="loading()" class="spinner-container py-5">
+        <div class="modern-loader">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="core"></div>
+        </div>
+        <p class="loading-text mb-0">Cargando cuentas...</p>
+      </div>
+
+      <!-- Vista de Móvil: Lista minimalista -->
+      <div class="show-mobile-only" *ngIf="!loading()">
+        <div class="px-3 cursor-pointer" *ngFor="let account of filteredAccounts()" (click)="goToDetail(account.id)">
+          <div class="py-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span [class]="account.status ? 'status-dot active' : 'status-dot'"></span>
+                <span class="fw-bold">{{account.accountNumber}}</span>
+              </div>
+
+              <div class="text-secondary small mb-1">
+                {{account.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}} | {{getCustomerName(account.clientId)}}
+              </div>
+
+              <!-- Toggle de Estado -->
+              <div class="d-flex align-items-center gap-2" style="margin-top: -2px;">
+                <label class="switch" style="transform: scale(0.65); transform-origin: left center;" (click)="$event.stopPropagation()" [title]="account.status ? 'Desactivar' : 'Activar'">
+                  <input type="checkbox" [checked]="account.status" (change)="toggleStatus(account)">
+                  <span class="slider"></span>
+                </label>
+                <span class="small fw-medium" [style.color]="account.status ? '#00c076' : '#848e9c'" style="font-size: 11px; margin-left: -8px;">
+                  {{account.status ? 'Activa' : 'Inactiva'}}
+                </span>
+              </div>
             </div>
-            <div class="text-secondary small">{{account.accountType}} | {{getCustomerName(account.clientId)}}</div>
+            <span class="material-icons text-secondary">chevron_right</span>
           </div>
-          <span class="text-secondary">›</span>
         </div>
       </div>
-    </div>
 
-    <!-- Vista de Escritorio: Tabla minimalista -->
-    <div class="hide-mobile">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Número de Cuenta</th>
-            <th>Tipo</th>
-            <th>Cliente</th>
-            <th>Estado</th>
-            <th class="text-end">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let account of filteredAccounts">
-            <td class="fw-bold">{{account.accountNumber}}</td>
-            <td>{{account.accountType}}</td>
-            <td>{{getCustomerName(account.clientId)}}</td>
-            <td>
-              <span class="status-badge" [ngClass]="account.status ? 'status-active' : 'status-inactive'">
-                {{account.status ? 'Activa' : 'Inactiva'}}
-              </span>
-            </td>
-            <td class="text-end">
-              <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-secondary btn-sm" (click)="goToDetail(account.id)">Ver</button>
-                <button class="btn btn-danger btn-sm" (click)="confirmDelete(account.id)">Eliminar</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div *ngIf="filteredAccounts.length === 0" class="empty-state">
-      <div class="empty-icon-container">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.2"/>
-          <path d="M3 10H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.2"/>
-          <path d="M16 14C16 15.1046 15.1046 16 14 16H10C8.89543 16 8 15.1046 8 14V12H16V14Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color, #f0b90b)"/>
-        </svg>
+      <!-- Vista de Escritorio: Tabla minimalista -->
+      <div class="hide-mobile" *ngIf="!loading()">
+        <table class="table">
+          <thead>
+            <tr>
+              <th><span class="grayscale-emoji">🔢</span> Número</th>
+              <th><span class="grayscale-emoji">🏦</span> Tipo</th>
+              <th><span class="grayscale-emoji">👤</span> Cliente</th>
+              <th class="text-center"><span class="grayscale-emoji">⚙️</span> Estado</th>
+              <th class="text-end" style="width: 120px;"><span class="grayscale-emoji">🛠️</span> Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let account of filteredAccounts()" (click)="goToDetail(account.id)" class="cursor-pointer">
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span [class]="account.status ? 'status-dot active' : 'status-dot'"></span>
+                  <span class="fw-bold">{{account.accountNumber}}</span>
+                </div>
+              </td>
+              <td>{{account.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}}</td>
+              <td class="small text-secondary">{{getCustomerName(account.clientId)}}</td>
+              <td class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <label class="switch" style="transform: scale(0.8);" (click)="$event.stopPropagation()">
+                    <input type="checkbox" [checked]="account.status" (change)="toggleStatus(account)">
+                    <span class="slider"></span>
+                  </label>
+                  <span class="small fw-medium" [style.color]="account.status ? '#00c076' : '#848e9c'" style="min-width: 55px; text-align: left;">
+                    {{account.status ? 'Activa' : 'Inactiva'}}
+                  </span>
+                </div>
+              </td>
+              <td class="text-end">
+                <div class="d-flex justify-content-end gap-2">
+                  <button class="btn btn-warning btn-sm align-items-center gap-1" (click)="$event.stopPropagation(); goToEdit(account.id)" title="Editar">
+                    <span class="material-icons" style="font-size: 16px;">edit</span>
+                    <span class="d-none d-lg-inline">Editar</span>
+                  </button>
+                  <button class="btn btn-danger btn-sm align-items-center gap-1" (click)="$event.stopPropagation(); confirmDelete(account.id)" title="Eliminar">
+                    <span class="material-icons" style="font-size: 16px;">delete</span>
+                    <span class="d-none d-lg-inline">Eliminar</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <h3>No se encontraron cuentas</h3>
-      <p>Intenta ajustar tu búsqueda o crea una nueva cuenta para comenzar a gestionar tus finanzas.</p>
-    </div>
-  </section>
+
+      <div *ngIf="!loading() && filteredAccounts().length === 0" class="empty-state">
+        <div class="empty-icon-container">
+          <span class="material-icons" style="font-size: 64px; opacity: 0.2; color: var(--accent-color, #f0b90b);">account_balance_wallet</span>
+        </div>
+        <h3>No se encontraron cuentas</h3>
+        <p>Intenta ajustar tu búsqueda o crea una nueva cuenta para comenzar a gestionar tus finanzas.</p>
+      </div>
+    </section>
+  </div>
 </div>
 
 <!-- Modal de Eliminación - Estilo Surface -->
-<div *ngIf="showDeleteModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
+<div *ngIf="showDeleteModal()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
   <div class="surface mx-3" style="width: 100%; max-width: 400px;">
     <h3 class="h5 mb-3">Eliminar cuenta</h3>
     <p class="text-secondary mb-4">¿Estás seguro de que deseas eliminar esta cuenta permanentemente?</p>
     <div class="d-flex justify-content-end gap-2">
-      <button class="btn btn-secondary" (click)="showDeleteModal = false">Cancelar</button>
+      <button class="btn btn-secondary" (click)="showDeleteModal.set(false)">Cancelar</button>
       <button class="btn btn-danger" (click)="onDelete()">Eliminar</button>
     </div>
   </div>
