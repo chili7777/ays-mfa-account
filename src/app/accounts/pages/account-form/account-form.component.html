@@ -100,11 +100,9 @@
         <!-- PASO 3: Estado -->
         <div *ngIf="currentStep() === 3" class="step-content animate-fade-in">
           <div class="mb-4 d-flex align-items-center justify-content-between py-3 surface-alt px-3 rounded">
-            <div>
-              <label for="status" class="fw-medium d-block mb-0">Estado: {{ f['status'].value ? 'Activa' : 'Inactiva' }}</label>
-              <span class="text-secondary small">
-                {{ f['status'].value ? 'Operativa para transacciones' : 'Deshabilitada temporalmente' }}
-              </span>
+            <div class="d-flex align-items-center gap-2">
+              <label for="status" class="fw-medium mb-0">Estado: {{ f['status'].value ? 'Activa' : 'Inactiva' }}</label>
+              <span class="material-icons text-secondary cursor-help" style="font-size: 16px;" [title]="f['status'].value ? 'Operativa para todas las transacciones' : 'Deshabilitada para movimientos'">info</span>
             </div>
             <label class="switch">
               <input

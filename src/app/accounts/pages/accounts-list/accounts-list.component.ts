@@ -53,7 +53,7 @@ export class AccountsListComponent implements OnInit {
 
   getCustomerName(id: string): string {
     const customer = this.customers().find(c => c.id === id);
-    return customer ? customer.name : 'Desconocido';
+    return customer ? customer.name : '';
   }
 
   maskAccountNumber(num: string | undefined): string {

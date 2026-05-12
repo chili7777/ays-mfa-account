@@ -20,15 +20,16 @@
       </div>
 
       @if (account(); as acc) {
-        <div class="d-flex justify-content-center align-items-center gap-3 animate-fade-in mb-2">
-          <span [class]="acc.status ? 'status-dot active' : 'status-dot'"></span>
+        <div class="d-flex justify-content-center align-items-center gap-2 animate-fade-in mb-2">
+          <span [class]="acc.status ? 'status-dot active' : 'status-dot'" [title]="acc.status ? 'La cuenta se encuentra operativa' : 'La cuenta está restringida'"></span>
           <span class="fw-medium small" [style.color]="acc.status ? '#00c076' : '#d41020'">
-            {{ acc.status ? 'Cuenta Activa' : 'Cuenta Inactiva' }}
+            {{ acc.status ? 'Activa' : 'Inactiva' }}
           </span>
-          <label class="switch" style="transform: scale(0.8);" [title]="acc.status ? 'Desactivar cuenta' : 'Activar cuenta'">
+          <label class="switch" style="transform: scale(0.7);" [title]="acc.status ? 'Desactivar cuenta' : 'Activar cuenta'">
             <input type="checkbox" [checked]="acc.status" (change)="toggleStatus()">
             <span class="slider"></span>
           </label>
+          <span class="material-icons text-secondary cursor-help" style="font-size: 16px;" [title]="acc.status ? 'Operativa para todas las transacciones bancarias' : 'Bloqueada temporalmente para movimientos'">info</span>
         </div>
       }
     </header>

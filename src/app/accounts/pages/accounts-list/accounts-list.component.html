@@ -51,18 +51,15 @@
               </div>
 
               <div class="text-secondary small mb-1">
-                {{account.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}} | {{getCustomerName(account.clientId)}}
+                {{account.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}}{{getCustomerName(account.clientId) ? ' | ' + getCustomerName(account.clientId) : ''}}
               </div>
 
               <!-- Toggle de Estado -->
               <div class="d-flex align-items-center gap-2" style="margin-top: -2px;">
-                <label class="switch" style="transform: scale(0.65); transform-origin: left center;" (click)="$event.stopPropagation()" [title]="account.status ? 'Desactivar' : 'Activar'">
+                <label class="switch" style="transform: scale(0.65); transform-origin: left center;" (click)="$event.stopPropagation()" [title]="account.status ? 'Cuenta Activa - Haga clic para desactivar' : 'Cuenta Inactiva - Haga clic para activar'">
                   <input type="checkbox" [checked]="account.status" (change)="toggleStatus(account)">
                   <span class="slider"></span>
                 </label>
-                <span class="small fw-medium" [style.color]="account.status ? '#00c076' : '#848e9c'" style="font-size: 11px; margin-left: -8px;">
-                  {{account.status ? 'Activa' : 'Inactiva'}}
-                </span>
               </div>
             </div>
             <span class="material-icons text-secondary">chevron_right</span>
@@ -93,14 +90,11 @@
               <td>{{account.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}}</td>
               <td class="small text-secondary">{{getCustomerName(account.clientId)}}</td>
               <td class="text-center">
-                <div class="d-flex align-items-center justify-content-center gap-2">
-                  <label class="switch" style="transform: scale(0.8);" (click)="$event.stopPropagation()">
+                <div class="d-flex align-items-center justify-content-center">
+                  <label class="switch" style="transform: scale(0.8);" (click)="$event.stopPropagation()" [title]="account.status ? 'Activa' : 'Inactiva'">
                     <input type="checkbox" [checked]="account.status" (change)="toggleStatus(account)">
                     <span class="slider"></span>
                   </label>
-                  <span class="small fw-medium" [style.color]="account.status ? '#00c076' : '#848e9c'" style="min-width: 55px; text-align: left;">
-                    {{account.status ? 'Activa' : 'Inactiva'}}
-                  </span>
                 </div>
               </td>
               <td class="text-end">
