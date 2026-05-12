@@ -1,26 +1,23 @@
 <div class="container py-4 d-flex justify-content-center align-items-center" style="min-height: 90vh;">
   <div class="w-100 animate-fade-in position-relative" style="max-width: 500px;">
 
-    <!-- Botón Volver - Escritorio (Posición absoluta lateral) -->
-    <button class="btn btn-icon position-absolute d-none d-lg-block" style="top: 1.5rem; left: -3rem;" (click)="goBack()" title="Volver">
-      <span class="material-icons">arrow_back</span>
-    </button>
-
-    <!-- Botón Volver - Móvil/Tablet (Dentro del flujo) -->
-    <div class="d-lg-none mb-3">
-      <button class="btn btn-icon" (click)="goBack()" title="Volver">
-        <span class="material-icons">arrow_back</span>
-      </button>
-    </div>
-
-    <header class="mb-5 text-center mt-4">
-      <div class="d-inline-flex p-3 rounded-circle mb-3" style="color: var(--accent-color);">
-        <span class="material-icons" style="font-size: 32px;">account_balance</span>
+    <header class="mb-5 mt-4">
+      <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-link p-0 text-white" style="text-decoration: none; min-width: auto; background: transparent;" (click)="goBack()" title="Volver">
+          <span class="material-icons">arrow_back</span>
+        </button>
+        <div class="flex-grow-1 d-flex justify-content-center pe-4">
+          <div class="d-inline-flex p-3 rounded-circle" style="color: var(--accent-color);">
+            <span class="material-icons" style="font-size: 32px;">account_balance</span>
+          </div>
+        </div>
       </div>
-      <h1 class="h3 mb-2 fw-bold">Detalle de Cuenta</h1>
-      <p class="text-secondary px-4 mb-3">
-        {{ account()?.accountNumber || 'Información detallada' }}
-      </p>
+      <div class="text-center">
+        <h1 class="h3 mb-2 fw-bold">Detalle de Cuenta</h1>
+        <p class="text-secondary px-4 mb-3">
+          {{ maskAccountNumber(account()?.accountNumber) || 'Información detallada' }}
+        </p>
+      </div>
 
       @if (account(); as acc) {
         <div class="d-flex justify-content-center align-items-center gap-3 animate-fade-in mb-2">
@@ -53,9 +50,10 @@
         </div>
         <h3 class="text-danger h5 mb-2">Aviso del Sistema</h3>
         <p class="text-secondary small mb-4">{{errorMessage()}}</p>
-        <button class="btn btn-secondary w-100" (click)="goBack()">
-          Volver al listado
-        </button>
+          <button class="btn btn-secondary w-100" (click)="goBack()">
+            <span class="material-icons d-xl-none" style="font-size: 18px;">arrow_back</span>
+            <span class="d-none d-xl-inline">Volver al listado</span>
+          </button>
       </div>
     } @else if (account(); as acc) {
       <div class="surface-alt p-4 shadow-sm">
@@ -64,7 +62,7 @@
             <span class="material-icons" style="font-size: 14px; opacity: 0.5;">numbers</span>
             Número de Cuenta
           </label>
-          <div class="form-control" style="border-bottom-color: rgba(43, 49, 57, 0.3);">{{acc.accountNumber}}</div>
+          <div class="form-control" style="border-bottom-color: rgba(43, 49, 57, 0.3);">{{maskAccountNumber(acc.accountNumber)}}</div>
         </div>
 
         <div class="mb-4">
@@ -107,11 +105,11 @@
         <div class="mt-5 d-flex gap-3">
           <button class="btn btn-warning flex-grow-1" (click)="goToEdit()">
             <span class="material-icons" style="font-size: 18px;">edit</span>
-            <span class="d-none d-lg-inline">Editar</span>
+            <span class="d-none d-xl-inline">Editar</span>
           </button>
           <button class="btn btn-danger flex-grow-1" (click)="confirmDelete(acc.id)">
             <span class="material-icons" style="font-size: 18px;">delete</span>
-            <span class="d-none d-lg-inline">Eliminar</span>
+            <span class="d-none d-xl-inline">Eliminar</span>
           </button>
         </div>
       </div>
@@ -131,8 +129,14 @@
     </div>
 
     <div class="d-flex gap-3">
-      <button class="btn btn-secondary flex-grow-1" (click)="showDeleteModal.set(false)">Cancelar</button>
-      <button class="btn btn-danger flex-grow-1" (click)="onDelete()">Eliminar</button>
+      <button class="btn btn-secondary flex-grow-1" (click)="showDeleteModal.set(false)">
+        <span class="material-icons d-xl-none" style="font-size: 18px;">close</span>
+        <span class="d-none d-xl-inline">Cancelar</span>
+      </button>
+      <button class="btn btn-danger flex-grow-1" (click)="onDelete()">
+        <span class="material-icons d-xl-none" style="font-size: 18px;">delete</span>
+        <span class="d-none d-xl-inline">Eliminar</span>
+      </button>
     </div>
   </div>
 </div>

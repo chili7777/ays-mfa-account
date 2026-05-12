@@ -126,18 +126,18 @@
         <!-- Navigation (Same style as customer) -->
         <div class="mt-5 d-flex gap-3">
           <button type="button" class="btn btn-secondary flex-grow-1" (click)="currentStep() === 1 ? goBack() : prevStep()">
-            <span class="material-icons d-lg-none" style="font-size: 18px;">{{currentStep() === 1 ? 'close' : 'arrow_back'}}</span>
-            <span class="d-none d-lg-inline">{{currentStep() === 1 ? 'Cancelar' : 'Anterior'}}</span>
+            <span class="material-icons d-xl-none" style="font-size: 18px;">{{currentStep() === 1 ? 'close' : 'arrow_back'}}</span>
+            <span class="d-none d-xl-inline">{{currentStep() === 1 ? 'Cancelar' : 'Anterior'}}</span>
           </button>
 
           <button *ngIf="currentStep() < totalSteps" type="button" class="btn btn-primary flex-grow-1" (click)="nextStep()">
-            <span class="material-icons d-lg-none" style="font-size: 18px;">arrow_forward</span>
-            <span class="d-none d-lg-inline">Siguiente</span>
+            <span class="material-icons d-xl-none" style="font-size: 18px;">arrow_forward</span>
+            <span class="d-none d-xl-inline">Siguiente</span>
           </button>
 
           <button *ngIf="currentStep() === totalSteps" type="submit" class="btn flex-grow-1" [ngClass]="isEdit ? 'btn-warning' : 'btn-success'" [disabled]="accountForm.invalid">
-            <span class="material-icons d-lg-none" style="font-size: 18px;">{{isEdit ? 'save' : 'check'}}</span>
-            <span class="d-none d-lg-inline">{{isEdit ? 'Guardar Cambios' : 'Confirmar Apertura'}}</span>
+            <span class="material-icons d-xl-none" style="font-size: 18px;">{{isEdit ? 'save' : 'check'}}</span>
+            <span class="d-none d-xl-inline">{{isEdit ? 'Guardar Cambios' : 'Confirmar Apertura'}}</span>
           </button>
         </div>
       </form>
