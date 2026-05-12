@@ -141,12 +141,6 @@ export class AccountDetailComponent implements OnInit {
     });
   }
 
-  maskAccountNumber(num: string | undefined): string {
-    if (!num) return '';
-    const last4 = num.slice(-4);
-    return `****${last4}`;
-  }
-
   goBack(): void {
     this.router.navigate(['/accounts']);
   }
