@@ -100,6 +100,10 @@
     gap: 8px;
     opacity: 0;
     transition: all 0.3s ease;
+
+    @media (max-width: 767px) {
+      display: none !important;
+    }
   }
 
   .btn-mini {
@@ -155,26 +159,6 @@
 
     .amount {
       font-size: 1.2rem;
-    }
-
-    .quick-actions {
-      opacity: 1;
-      transform: none;
-      position: static;
-      flex-direction: row;
-      justify-content: flex-end;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      gap: 12px;
-    }
-
-    .btn-mini {
-      width: 30px;
-      height: 30px;
-      .material-icons {
-        font-size: 16px;
-      }
     }
   }
 }
