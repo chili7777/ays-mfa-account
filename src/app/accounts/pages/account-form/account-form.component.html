@@ -1,0 +1,67 @@
+<div class="container mt-4">
+  <header class="mb-4">
+    <h1 class="h3">{{isEdit ? 'Editar Cuenta' : 'Nueva Cuenta'}}</h1>
+  </header>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label d-block text-muted small">ID de Cliente</label>
+          <input
+            type="text"
+            formControlName="clientId"
+            class="form-control"
+          >
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label d-block text-muted small">Número de Cuenta</label>
+          <input
+            type="text"
+            formControlName="accountNumber"
+            class="form-control"
+          >
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label d-block text-muted small">Tipo de Cuenta</label>
+          <select
+            formControlName="accountType"
+            class="form-control"
+          >
+            <option value="SAVINGS">Ahorros (SAVINGS)</option>
+            <option value="CURRENT">Corriente (CURRENT)</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label d-block text-muted small">Saldo Inicial</label>
+          <input
+            type="number"
+            formControlName="initialBalance"
+            class="form-control"
+          >
+        </div>
+
+        <div class="mb-3 d-flex align-items-center gap-2">
+          <input
+            type="checkbox"
+            id="status"
+            formControlName="status"
+          >
+          <label for="status" class="form-label mb-0">Cuenta Activa</label>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+          <button type="submit" class="btn btn-primary w-100" [disabled]="accountForm.invalid">
+            {{isEdit ? 'Actualizar' : 'Crear'}}
+          </button>
+          <button type="button" class="btn btn-secondary w-100" (click)="goBack()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

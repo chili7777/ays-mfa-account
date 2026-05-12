@@ -1,0 +1,60 @@
+<div class="container mt-4">
+  <header class="mb-4 d-flex align-items-center gap-2">
+    <button class="btn btn-secondary btn-sm" (click)="goBack()">←</button>
+    <h1 class="h3 mb-0">Detalle de Cuenta</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="text-center p-5 card">
+      <p>Cargando información...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="text-center p-5 card">
+      <div class="alert alert-danger mb-3">
+        {{errorMessage()}}
+      </div>
+      <button class="btn btn-secondary" (click)="goBack()">Volver al listado</button>
+    </div>
+  } @else if (account(); as acc) {
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <span>Cuenta: {{acc.accountNumber}}</span>
+        <span class="status-badge" [ngClass]="acc.status ? 'status-active' : 'status-inactive'">
+          {{acc.status ? 'Activa' : 'Inactiva'}}
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="text-muted small d-block">ID de Cuenta</label>
+          <span>{{acc.id}}</span>
+        </div>
+        <div class="mb-3">
+          <label class="text-muted small d-block">ID de Cliente</label>
+          <span>{{acc.clientId}}</span>
+        </div>
+        <div class="mb-3">
+          <label class="text-muted small d-block">Tipo de Cuenta</label>
+          <span>{{acc.accountType}}</span>
+        </div>
+        <div class="mb-3">
+          <label class="text-muted small d-block">Saldo Inicial</label>
+          <span>{{acc.initialBalance | currency}}</span>
+        </div>
+        <div class="mt-4 d-flex flex-column gap-2">
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary w-100" (click)="goToEdit()">Editar</button>
+            <button class="btn" [ngClass]="acc.status ? 'btn-warning' : 'btn-success'" class="w-100 btn" (click)="toggleStatus()">
+              {{acc.status ? 'Desactivar' : 'Activar'}}
+            </button>
+          </div>
+          <button class="btn btn-secondary w-100" (click)="goBack()">Volver</button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="text-center p-5 card">
+      <p>No se encontró información de la cuenta.</p>
+      <button class="btn btn-secondary" (click)="goBack()">Volver al listado</button>
+    </div>
+  }
+</div>

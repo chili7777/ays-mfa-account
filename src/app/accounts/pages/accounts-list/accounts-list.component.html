@@ -1,0 +1,108 @@
+<div class="container mt-4">
+  <header class="mb-4">
+    <h1>Gestión de Cuentas</h1>
+    <p class="text-muted">Administración de cuentas bancarias</p>
+  </header>
+
+  <section class="search-section mb-4">
+    <div class="card p-3">
+      <h2 class="h5 mb-3">Búsqueda de Cuentas</h2>
+      <div class="d-flex gap-2">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Buscar por ID, número o cliente..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        >
+        <button class="btn btn-primary" type="button" (click)="onSearch()">
+          Buscar
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="list-section">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">Listado</h2>
+      <button class="btn btn-success" (click)="goToCreate()">
+        + Nueva Cuenta
+      </button>
+    </div>
+
+    <!-- Vista de Móvil: Cards -->
+    <div class="show-mobile-only">
+      <div class="card" *ngFor="let account of filteredAccounts">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <h3 class="h6 mb-0">{{account.accountNumber}}</h3>
+              <small class="text-muted">{{account.accountType}}</small>
+            </div>
+            <span class="status-badge" [ngClass]="account.status ? 'status-active' : 'status-inactive'">
+              {{account.status ? 'Activa' : 'Inactiva'}}
+            </span>
+          </div>
+          <p class="mb-2 small"><strong>Cliente:</strong> {{account.clientId}}</p>
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-secondary btn-sm" (click)="goToDetail(account.id)">Detalle</button>
+            <button class="btn btn-danger btn-sm" (click)="confirmDelete(account.id)">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista de Escritorio: Tabla -->
+    <div class="hide-mobile">
+      <div class="card overflow-hidden">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Número de Cuenta</th>
+              <th>Tipo</th>
+              <th>Cliente</th>
+              <th>Estado</th>
+              <th style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let account of filteredAccounts">
+              <td>{{account.accountNumber}}</td>
+              <td>{{account.accountType}}</td>
+              <td>{{account.clientId}}</td>
+              <td>
+                <span class="status-badge" [ngClass]="account.status ? 'status-active' : 'status-inactive'">
+                  {{account.status ? 'Activa' : 'Inactiva'}}
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <button class="btn btn-secondary btn-sm" (click)="goToDetail(account.id)" style="margin-right: 4px;">Ver</button>
+                <button class="btn btn-danger btn-sm" (click)="confirmDelete(account.id)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="filteredAccounts.length === 0" class="text-center p-5 card">
+      <p class="text-muted mb-0">No se encontraron cuentas.</p>
+    </div>
+  </section>
+</div>
+
+<!-- Modal de Eliminación -->
+<div *ngIf="showDeleteModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
+  <div class="card" style="width: 90%; max-width: 400px; margin-bottom: 0;">
+    <div class="card-header">
+      Confirmar Eliminación
+    </div>
+    <div class="card-body">
+      <p>¿Está seguro que desea eliminar esta cuenta?</p>
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button class="btn btn-secondary" (click)="showDeleteModal = false">Cancelar</button>
+        <button class="btn btn-danger" (click)="onDelete()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
