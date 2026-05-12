@@ -3,6 +3,6 @@
 :host {
   display: block;
   min-height: 100dvh;
-  background-color: $theme-dark-bg;
+  background-color: transparent; /* Permitir que el fondo de la shell se vea si coincide */
   color: $theme-dark-text-primary;
 }

@@ -1,31 +1,33 @@
-<div class="container mt-4">
-  <header class="mb-4">
-    <h1 class="h3">{{isEdit ? 'Editar Cuenta' : 'Nueva Cuenta'}}</h1>
+<div class="container py-4">
+  <header class="mb-4 px-2">
+    <h1 class="h4 mb-0">{{isEdit ? 'Editar Cuenta' : 'Nueva Cuenta'}}</h1>
   </header>
 
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
-        <div class="mb-3">
-          <label class="form-label d-block text-muted small">ID de Cliente</label>
+  <div class="surface-alt mx-2">
+    <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-12 col-md-6 mb-4">
+          <label class="form-label d-block text-secondary small mb-2">ID de Cliente</label>
           <input
             type="text"
             formControlName="clientId"
             class="form-control"
+            placeholder="Ej: CLI-001"
           >
         </div>
 
-        <div class="mb-3">
-          <label class="form-label d-block text-muted small">Número de Cuenta</label>
+        <div class="col-12 col-md-6 mb-4">
+          <label class="form-label d-block text-secondary small mb-2">Número de Cuenta</label>
           <input
             type="text"
             formControlName="accountNumber"
             class="form-control"
+            placeholder="Ej: 1234567890"
           >
         </div>
 
-        <div class="mb-3">
-          <label class="form-label d-block text-muted small">Tipo de Cuenta</label>
+        <div class="col-12 col-md-6 mb-4">
+          <label class="form-label d-block text-secondary small mb-2">Tipo de Cuenta</label>
           <select
             formControlName="accountType"
             class="form-control"
@@ -35,33 +37,40 @@
           </select>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label d-block text-muted small">Saldo Inicial</label>
+        <div class="col-12 col-md-6 mb-4">
+          <label class="form-label d-block text-secondary small mb-2">Saldo Inicial</label>
           <input
             type="number"
             formControlName="initialBalance"
             class="form-control"
+            placeholder="0.00"
           >
         </div>
+      </div>
 
-        <div class="mb-3 d-flex align-items-center gap-2">
+      <div class="mb-4 d-flex align-items-center justify-content-between py-3" style="border-top: 1px solid var(--border-color, rgba(43, 49, 57, 0.5)); border-bottom: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
+        <div>
+          <label for="status" class="form-label mb-0 d-block">Estado de la cuenta</label>
+          <span class="text-secondary small">Define si la cuenta estará activa inmediatamente</span>
+        </div>
+        <label class="switch">
           <input
             type="checkbox"
             id="status"
             formControlName="status"
           >
-          <label for="status" class="form-label mb-0">Cuenta Activa</label>
-        </div>
+          <span class="slider"></span>
+        </label>
+      </div>
 
-        <div class="mt-4 d-flex gap-2">
-          <button type="submit" class="btn btn-primary w-100" [disabled]="accountForm.invalid">
-            {{isEdit ? 'Actualizar' : 'Crear'}}
-          </button>
-          <button type="button" class="btn btn-secondary w-100" (click)="goBack()">
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </div>
+      <div class="mt-5 d-flex gap-3">
+        <button type="submit" class="btn btn-lg w-100" [ngClass]="isEdit ? 'btn-warning' : 'btn-success'" [disabled]="accountForm.invalid">
+          {{isEdit ? 'Actualizar Cuenta' : 'Crear Cuenta'}}
+        </button>
+        <button type="button" class="btn btn-secondary w-100" (click)="goBack()">
+          Cancelar
+        </button>
+      </div>
+    </form>
   </div>
 </div>

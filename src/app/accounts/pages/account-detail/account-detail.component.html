@@ -1,60 +1,73 @@
-<div class="container mt-4">
-  <header class="mb-4 d-flex align-items-center gap-2">
-    <button class="btn btn-secondary btn-sm" (click)="goBack()">←</button>
-    <h1 class="h3 mb-0">Detalle de Cuenta</h1>
+<div class="container py-4">
+  <header class="mb-4 d-flex align-items-center gap-3 px-2">
+    <button class="btn btn-secondary btn-sm" (click)="goBack()" title="Volver">←</button>
+    <h1 class="h4 mb-0">Detalle de Cuenta</h1>
   </header>
 
   @if (loading()) {
-    <div class="text-center p-5 card">
-      <p>Cargando información...</p>
+    <div class="text-center py-5">
+      <p class="text-secondary">Cargando información...</p>
     </div>
   } @else if (errorMessage()) {
-    <div class="text-center p-5 card">
-      <div class="alert alert-danger mb-3">
+    <div class="surface mx-2 text-center py-5">
+      <div class="text-danger mb-3">
         {{errorMessage()}}
       </div>
       <button class="btn btn-secondary" (click)="goBack()">Volver al listado</button>
     </div>
   } @else if (account(); as acc) {
-    <div class="card shadow-sm">
-      <div class="card-header">
-        <span>Cuenta: {{acc.accountNumber}}</span>
+    <div class="surface mx-2">
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
+        <div>
+          <span class="text-secondary small d-block">Número de Cuenta</span>
+          <span class="h5 mb-0">{{acc.accountNumber}}</span>
+        </div>
         <span class="status-badge" [ngClass]="acc.status ? 'status-active' : 'status-inactive'">
           {{acc.status ? 'Activa' : 'Inactiva'}}
         </span>
       </div>
-      <div class="card-body">
-        <div class="mb-3">
-          <label class="text-muted small d-block">ID de Cuenta</label>
-          <span>{{acc.id}}</span>
+
+      <div class="row g-4">
+        <div class="mb-4">
+          <label class="text-secondary small d-block mb-1">ID de Cliente</label>
+          <span class="fw-medium">{{acc.clientId}}</span>
         </div>
-        <div class="mb-3">
-          <label class="text-muted small d-block">ID de Cliente</label>
-          <span>{{acc.clientId}}</span>
+        <div class="mb-4">
+          <label class="text-secondary small d-block mb-1">Tipo de Cuenta</label>
+          <span class="fw-medium">{{acc.accountType}}</span>
         </div>
-        <div class="mb-3">
-          <label class="text-muted small d-block">Tipo de Cuenta</label>
-          <span>{{acc.accountType}}</span>
+        <div class="mb-4">
+          <label class="text-secondary small d-block mb-1">Saldo Inicial</label>
+          <span class="fw-medium h5">{{acc.initialBalance | currency}}</span>
         </div>
-        <div class="mb-3">
-          <label class="text-muted small d-block">Saldo Inicial</label>
-          <span>{{acc.initialBalance | currency}}</span>
+      </div>
+
+      <div class="mt-4 pt-4 d-flex flex-column gap-3" style="border-top: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
+        <div class="d-flex gap-2">
+          <button class="btn btn-warning w-100" (click)="goToEdit()">Editar</button>
+          <button class="btn btn-secondary w-100" (click)="toggleStatus()">
+            {{acc.status ? 'Desactivar' : 'Activar'}}
+          </button>
         </div>
-        <div class="mt-4 d-flex flex-column gap-2">
-          <div class="d-flex gap-2">
-            <button class="btn btn-primary w-100" (click)="goToEdit()">Editar</button>
-            <button class="btn" [ngClass]="acc.status ? 'btn-warning' : 'btn-success'" class="w-100 btn" (click)="toggleStatus()">
-              {{acc.status ? 'Desactivar' : 'Activar'}}
-            </button>
-          </div>
-          <button class="btn btn-secondary w-100" (click)="goBack()">Volver</button>
-        </div>
+        <button class="btn btn-danger w-100" (click)="confirmDelete(acc.id)">Eliminar Cuenta</button>
       </div>
     </div>
   } @else {
-    <div class="text-center p-5 card">
-      <p>No se encontró información de la cuenta.</p>
+    <div class="text-center py-5">
+      <p class="text-secondary">No se encontró información de la cuenta.</p>
       <button class="btn btn-secondary" (click)="goBack()">Volver al listado</button>
     </div>
   }
+</div>
+
+<!-- Modal de Eliminación - Estilo Surface -->
+<div *ngIf="showDeleteModal()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
+  <div class="surface mx-3" style="width: 100%; max-width: 400px;">
+    <h3 class="h5 mb-3">Eliminar cuenta</h3>
+    <p class="text-secondary mb-4">¿Estás seguro de que deseas eliminar esta cuenta permanentemente?</p>
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-secondary" (click)="showDeleteModal.set(false)">Cancelar</button>
+      <button class="btn btn-danger" (click)="onDelete()">Eliminar</button>
+    </div>
+  </div>
 </div>

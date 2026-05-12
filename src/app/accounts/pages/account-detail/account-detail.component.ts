@@ -19,6 +19,7 @@ export class AccountDetailComponent implements OnInit {
   account = signal<Account | null>(null);
   loading = signal(true);
   errorMessage = signal<string | null>(null);
+  showDeleteModal = signal(false);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -68,6 +69,31 @@ export class AccountDetailComponent implements OnInit {
           console.error('Error al cambiar estado:', err);
           this.errorMessage.set('No se pudo cambiar el estado de la cuenta.');
           this.loading.set(false);
+        }
+      });
+    }
+  }
+
+  confirmDelete(id: string | undefined): void {
+    if (id) {
+      this.showDeleteModal.set(true);
+    }
+  }
+
+  onDelete(): void {
+    const currentAccount = this.account();
+    if (currentAccount && currentAccount.id) {
+      this.loading.set(true);
+      this.accountService.deleteAccount(currentAccount.id).subscribe({
+        next: () => {
+          this.showDeleteModal.set(false);
+          this.router.navigate(['/accounts']);
+        },
+        error: (err) => {
+          console.error('Error al eliminar:', err);
+          this.errorMessage.set('No se pudo eliminar la cuenta.');
+          this.loading.set(false);
+          this.showDeleteModal.set(false);
         }
       });
     }
