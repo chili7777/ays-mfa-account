@@ -1,5 +1,6 @@
 export interface Account {
   id?: string;
+  accountId?: string;
   clientId: string;
   accountNumber: string;
   accountType: 'SAVINGS' | 'CURRENT';

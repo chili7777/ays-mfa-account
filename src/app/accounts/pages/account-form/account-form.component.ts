@@ -91,9 +91,11 @@ export class AccountFormComponent implements OnInit {
     const formValue = this.accountForm.getRawValue();
 
     if (this.isEdit) {
+      // Para el PUT enviamos el objeto completo (incluyendo campos deshabilitados)
+      // Aseguramos que el accountId esté en el cuerpo
       const updateData = {
-        accountType: formValue.accountType,
-        status: formValue.status
+        ...formValue,
+        accountId: this.accountId
       };
 
       this.accountService.updateAccount(updateData, this.accountId!).subscribe({
@@ -103,7 +105,8 @@ export class AccountFormComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al actualizar', err);
-          alert('Error al actualizar la cuenta');
+          const errorMsg = err.error?.detail || err.error?.message || 'Error al actualizar la cuenta';
+          alert(errorMsg);
         }
       });
     } else {
