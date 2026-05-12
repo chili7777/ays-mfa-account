@@ -22,7 +22,7 @@
       @if (account(); as acc) {
         <div class="d-flex justify-content-center align-items-center gap-2 animate-fade-in mb-2">
           <span [class]="acc.status ? 'status-dot active' : 'status-dot'" [title]="acc.status ? 'La cuenta se encuentra operativa' : 'La cuenta está restringida'"></span>
-          <span class="text-secondary small fw-medium">{{ acc.status ? 'Activa' : 'Inactiva' }}</span>
+          <span class="text-secondary small fw-medium">{{ acc.status ? 'Activo' : 'Inactivo' }}</span>
           <label class="switch" style="transform: scale(0.7);" [title]="acc.status ? 'Desactivar cuenta' : 'Activar cuenta'">
             <input type="checkbox" [checked]="acc.status" (change)="toggleStatus()">
             <span class="slider"></span>
@@ -70,12 +70,14 @@
             Cliente Titular
           </label>
           @if (customer(); as c) {
-            <div class="form-control" style="border-bottom-color: rgba(43, 49, 57, 0.3);">
-              {{c.name}} ({{c.identification}})
+            <div class="form-control d-flex align-items-center justify-content-between" style="border-bottom-color: rgba(43, 49, 57, 0.3);">
+              <span class="fw-medium">{{c.name}}</span>
+              <span class="text-secondary small opacity-50">{{c.identification}}</span>
             </div>
           } @else {
-            <div class="form-control text-secondary" style="border-bottom-color: rgba(43, 49, 57, 0.3);">
-              ID: {{acc.clientId}}
+            <div class="form-control text-secondary d-flex align-items-center gap-2" style="border-bottom-color: rgba(43, 49, 57, 0.3); font-style: italic;">
+              <span class="material-icons animate-spin" style="font-size: 14px;">sync</span>
+              Buscando información del titular...
             </div>
           }
         </div>

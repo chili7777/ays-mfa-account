@@ -36,21 +36,60 @@
 
         <!-- PASO 1: Cliente y Número -->
         <div *ngIf="currentStep() === 1" class="step-content animate-fade-in">
-          <div class="mb-4">
+          <div class="mb-4 position-relative">
             <label class="text-secondary small d-block mb-2">Cliente Titular</label>
-            <select
-              formControlName="clientId"
-              class="form-control"
-              [class.is-invalid]="f['clientId'].invalid && f['clientId'].touched"
-            >
-              <option value="" disabled selected>Seleccione un cliente</option>
-              <option *ngFor="let customer of customers()" [value]="customer.id">
-                {{customer.name}} ({{customer.identification}})
-              </option>
-            </select>
+
+            <div class="custom-select-container" [class.is-invalid]="f['clientId'].invalid && f['clientId'].touched">
+              <div class="selected-value-box d-flex align-items-center justify-content-between form-control"
+                   (click)="toggleCustomerDropdown()"
+                   [class.disabled]="isEdit">
+                <span [class.text-secondary]="!selectedClientId()">{{selectedCustomerName()}}</span>
+                <span class="material-icons opacity-50">{{showCustomerDropdown() ? 'expand_less' : 'expand_more'}}</span>
+              </div>
+
+              <!-- Dropdown Panel -->
+              <div *ngIf="showCustomerDropdown()" class="dropdown-panel shadow-lg animate-fade-in">
+                <div class="p-2 search-container">
+                  <div class="position-relative">
+                    <span class="material-icons position-absolute top-50 translate-middle-y ms-2 text-secondary" style="font-size: 18px;">search</span>
+                    <input
+                      type="text"
+                      class="form-control form-control-sm ps-5"
+                      placeholder="Buscar por nombre o identificación..."
+                      [ngModel]="customerSearchTerm()"
+                      (ngModelChange)="customerSearchTerm.set($event)"
+                      [ngModelOptions]="{standalone: true}"
+                      (click)="$event.stopPropagation()"
+                    >
+                  </div>
+                </div>
+
+                <div class="options-list">
+                  <div
+                    *ngFor="let customer of filteredCustomers()"
+                    class="option-item p-2 px-3"
+                    (mousedown)="selectCustomer(customer); $event.stopPropagation()"
+                    [class.active]="selectedClientId() === customer.id"
+                  >
+                    <div class="d-flex flex-column pointer-events-none">
+                      <span class="fw-medium">{{customer.name}}</span>
+                      <span class="text-secondary small opacity-75">{{customer.identification}}</span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="filteredCustomers().length === 0" class="p-3 text-center text-secondary small">
+                    No se encontraron clientes que coincidan
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="invalid-feedback animate-fade-in" *ngIf="f['clientId'].errors?.['required'] && f['clientId'].touched">
               Debe seleccionar un cliente
             </div>
+
+            <!-- Overlay para cerrar al hacer click fuera -->
+            <div *ngIf="showCustomerDropdown()" class="dropdown-overlay" (click)="showCustomerDropdown.set(false)"></div>
           </div>
 
           <div class="mb-4">
@@ -67,6 +106,12 @@
             </div>
             <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['pattern'] && f['accountNumber'].touched">
               Debe ser solo números
+            </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['minlength'] && f['accountNumber'].touched">
+              Debe tener al menos 6 dígitos
+            </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['maxlength'] && f['accountNumber'].touched">
+              No puede tener más de 10 dígitos
             </div>
           </div>
         </div>
@@ -102,6 +147,12 @@
             </div>
             <div class="invalid-feedback animate-fade-in" *ngIf="f['initialBalance'].errors?.['min'] && f['initialBalance'].touched">
               El saldo no puede ser negativo
+            </div>
+
+            <!-- Mensaje de bloqueo por movimientos -->
+            <div *ngIf="isEdit && hasMovements()" class="mt-3 warning-message d-flex align-items-center gap-2 animate-fade-in">
+              <span class="material-icons text-warning" style="font-size: 18px;">info_outline</span>
+              <span class="text-secondary small">No se puede actualizar el saldo porque la cuenta ya registra movimientos.</span>
             </div>
           </div>
         </div>

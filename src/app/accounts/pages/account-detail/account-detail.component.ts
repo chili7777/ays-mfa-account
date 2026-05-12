@@ -59,10 +59,19 @@ export class AccountDetailComponent implements OnInit {
   }
 
   loadCustomer(clientId: string): void {
-    this.customerService.getCustomers().subscribe({
-      next: (customers) => {
-        const found = customers.find(c => c.id === clientId);
-        if (found) this.customer.set(found);
+    this.customerService.getCustomerById(clientId).subscribe({
+      next: (customer) => {
+        if (customer) this.customer.set(customer);
+      },
+      error: (err) => {
+        console.error('Error al cargar cliente individual:', err);
+        // Fallback: intentar buscar en la lista completa si falla el individual por alguna razón de API
+        this.customerService.getCustomers().subscribe({
+          next: (customers) => {
+            const found = customers.find(c => c.id === clientId);
+            if (found) this.customer.set(found);
+          }
+        });
       }
     });
   }

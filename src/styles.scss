@@ -342,6 +342,11 @@ input:checked + .slider {
   to { transform: rotate(360deg); }
 }
 
+.animate-spin {
+  animation: ring-rotate 2s linear infinite;
+  display: inline-block;
+}
+
 @keyframes core-pulse {
   0%, 100% { transform: scale(1); opacity: 0.5; }
   50% { transform: scale(1.5); opacity: 1; }
