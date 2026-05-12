@@ -22,6 +22,7 @@
       @if (account(); as acc) {
         <div class="d-flex justify-content-center align-items-center gap-2 animate-fade-in mb-2">
           <span [class]="acc.status ? 'status-dot active' : 'status-dot'" [title]="acc.status ? 'La cuenta se encuentra operativa' : 'La cuenta está restringida'"></span>
+          <span class="text-secondary small fw-medium">{{ acc.status ? 'Activa' : 'Inactiva' }}</span>
           <label class="switch" style="transform: scale(0.7);" [title]="acc.status ? 'Desactivar cuenta' : 'Activar cuenta'">
             <input type="checkbox" [checked]="acc.status" (change)="toggleStatus()">
             <span class="slider"></span>

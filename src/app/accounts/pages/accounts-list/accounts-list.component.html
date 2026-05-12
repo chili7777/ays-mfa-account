@@ -56,6 +56,7 @@
 
               <!-- Toggle de Estado -->
               <div class="d-flex align-items-center gap-2" style="margin-top: -2px;">
+                <span class="text-secondary small fw-medium" style="font-size: 10px;">{{ account.status ? 'Activa' : 'Inactiva' }}</span>
                 <label class="switch" style="transform: scale(0.65); transform-origin: left center;" (click)="$event.stopPropagation()" [title]="account.status ? 'Cuenta Activa - Haga clic para desactivar' : 'Cuenta Inactiva - Haga clic para activar'">
                   <input type="checkbox" [checked]="account.status" (change)="toggleStatus(account)">
                   <span class="slider"></span>
@@ -90,7 +91,8 @@
               <td>{{account.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}}</td>
               <td class="small text-secondary">{{getCustomerName(account.clientId)}}</td>
               <td class="text-center">
-                <div class="d-flex align-items-center justify-content-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <span class="text-secondary small fw-medium">{{ account.status ? 'Activa' : 'Inactiva' }}</span>
                   <label class="switch" style="transform: scale(0.8);" (click)="$event.stopPropagation()" [title]="account.status ? 'Activa' : 'Inactiva'">
                     <input type="checkbox" [checked]="account.status" (change)="toggleStatus(account)">
                     <span class="slider"></span>
