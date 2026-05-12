@@ -1,7 +1,7 @@
-<div class="container py-4">
+<div class="container py-3 py-md-4">
   <div class="desktop-card shadow-sm animate-fade-in">
     <!-- Section Búsqueda - Minimalista (Consistente con customer) -->
-    <section class="search-section mb-4">
+    <section class="search-section mb-3 mb-md-4">
       <div class="d-flex gap-2">
         <div class="position-relative w-100">
           <span class="material-icons position-absolute top-50 translate-middle-y ms-3 text-secondary" style="font-size: 18px;">search</span>
@@ -22,7 +22,7 @@
     </section>
 
     <section class="list-section">
-      <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+      <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2">
         <h2 class="h5 mb-0">Mis Cuentas</h2>
         <button class="btn btn-success btn-sm" (click)="goToCreate()">
           <span class="material-icons d-md-none" style="font-size: 18px;">add</span>
@@ -40,7 +40,6 @@
         <p class="loading-text mb-0">Cargando cuentas...</p>
       </div>
 
-      <!-- Nueva Vista de Tarjetas (Responsive Grid) -->
       <div class="accounts-grid" *ngIf="!loading()">
         <div class="account-item animate-fade-in" *ngFor="let account of filteredAccounts()" (click)="goToDetail(account.id)">
           <div class="account-card-modern">
@@ -55,7 +54,7 @@
             </div>
 
             <!-- Parte Inferior -->
-            <div class="card-bottom d-flex justify-content-between align-items-end mt-4">
+            <div class="card-bottom d-flex justify-content-between align-items-end mt-3 mt-md-4">
               <div class="balance-info">
                 <span class="small-label">Saldo disponible</span>
                 <div class="balance-display mt-1">
@@ -65,7 +64,7 @@
                 </div>
               </div>
 
-              <div class="card-actions-row d-flex align-items-center gap-3">
+              <div class="card-actions-row d-flex align-items-center gap-2 gap-md-3">
                 <button class="icon-btn-toggle" (click)="$event.stopPropagation(); toggleBalancesVisibility()" [title]="isBalancesVisible() ? 'Ocultar saldo' : 'Mostrar saldo'">
                   <span class="material-icons">{{ isBalancesVisible() ? 'visibility' : 'visibility_off' }}</span>
                 </button>
