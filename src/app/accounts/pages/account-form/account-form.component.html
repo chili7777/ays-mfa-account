@@ -7,13 +7,16 @@
     <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
       <div class="row">
         <div class="col-12 col-md-6 mb-4">
-          <label class="form-label d-block text-secondary small mb-2">ID de Cliente</label>
-          <input
-            type="text"
+          <label class="form-label d-block text-secondary small mb-2">Cliente</label>
+          <select
             formControlName="clientId"
             class="form-control"
-            placeholder="Ej: CLI-001"
           >
+            <option value="" disabled selected>Seleccione un cliente</option>
+            <option *ngFor="let customer of customers" [value]="customer.id">
+              {{customer.name}} ({{customer.identification}})
+            </option>
+          </select>
         </div>
 
         <div class="col-12 col-md-6 mb-4">

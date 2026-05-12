@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../services/account.service';
+import { CustomerService } from '../../services/customer.service';
+import { Customer } from '../../interfaces/customer.interface';
 
 @Component({
   selector: 'app-account-form',
@@ -16,10 +18,12 @@ export class AccountFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
+  private readonly customerService = inject(CustomerService);
 
   accountForm: FormGroup;
   isEdit = false;
   accountId: string | null = null;
+  customers: Customer[] = [];
 
   constructor() {
     this.accountForm = this.fb.group({
@@ -31,7 +35,17 @@ export class AccountFormComponent implements OnInit {
     });
   }
 
+  loadCustomers(): void {
+    this.customerService.getCustomers().subscribe({
+      next: (customers) => {
+        this.customers = customers;
+      },
+      error: (err) => console.error('Error al cargar clientes', err)
+    });
+  }
+
   ngOnInit(): void {
+    this.loadCustomers();
     this.accountId = this.route.snapshot.paramMap.get('id');
     if (this.accountId) {
       this.isEdit = true;

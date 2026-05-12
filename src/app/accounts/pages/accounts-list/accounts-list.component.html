@@ -37,7 +37,7 @@
                 •
               </span>
             </div>
-            <div class="text-secondary small">{{account.accountType}} | {{account.clientId}}</div>
+            <div class="text-secondary small">{{account.accountType}} | {{getCustomerName(account.clientId)}}</div>
           </div>
           <span class="text-secondary">›</span>
         </div>
@@ -60,14 +60,17 @@
           <tr *ngFor="let account of filteredAccounts">
             <td class="fw-bold">{{account.accountNumber}}</td>
             <td>{{account.accountType}}</td>
-            <td>{{account.clientId}}</td>
+            <td>{{getCustomerName(account.clientId)}}</td>
             <td>
               <span class="status-badge" [ngClass]="account.status ? 'status-active' : 'status-inactive'">
                 {{account.status ? 'Activa' : 'Inactiva'}}
               </span>
             </td>
             <td style="text-align: right;">
-              <button class="btn btn-secondary btn-sm" (click)="goToDetail(account.id)">Ver</button>
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-secondary btn-sm" (click)="goToDetail(account.id)">Ver</button>
+                <button class="btn btn-danger btn-sm" (click)="confirmDelete(account.id)">Eliminar</button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -76,7 +79,12 @@
 
     <div *ngIf="filteredAccounts.length === 0" class="empty-state">
       <div class="empty-icon-container">
-        <span class="material-icons">account_balance_wallet</span>
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.2"/>
+          <path d="M12 22V12M12 12L21 7M12 12L3 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.2"/>
+          <path d="M12 12L12 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color, #f0b90b)"/>
+          <circle cx="12" cy="18" r="1" fill="currentColor" style="color: var(--accent-color, #f0b90b)"/>
+        </svg>
       </div>
       <h3>No se encontraron cuentas</h3>
       <p>Intenta ajustar tu búsqueda o crea una nueva cuenta para comenzar a gestionar tus finanzas.</p>

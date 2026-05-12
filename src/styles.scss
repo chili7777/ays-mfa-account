@@ -12,6 +12,7 @@ html, body {
   font-family: $font-family-primary;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* Evitar scroll lateral en móviles */
 
   /* Ocultar barra de desplazamiento pero permitir scroll */
   scrollbar-width: none; /* Firefox */

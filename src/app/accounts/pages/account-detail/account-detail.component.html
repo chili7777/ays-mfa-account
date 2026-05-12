@@ -29,8 +29,13 @@
 
       <div class="row g-4">
         <div class="mb-4">
-          <label class="text-secondary small d-block mb-1">ID de Cliente</label>
-          <span class="fw-medium">{{acc.clientId}}</span>
+          <label class="text-secondary small d-block mb-1">Cliente</label>
+          @if (customer(); as c) {
+            <div class="fw-medium">{{c.name}}</div>
+            <div class="text-secondary small">{{c.identification}} | {{c.email}}</div>
+          } @else {
+            <span class="fw-medium">{{acc.clientId}}</span>
+          }
         </div>
         <div class="mb-4">
           <label class="text-secondary small d-block mb-1">Tipo de Cuenta</label>
