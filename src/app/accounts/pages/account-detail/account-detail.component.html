@@ -2,11 +2,11 @@
   <div class="w-100 animate-fade-in position-relative" style="max-width: 500px;">
 
     <header class="mb-5 mt-4">
-      <div class="d-flex align-items-center mb-3">
-        <button class="btn btn-link p-0 text-white" style="text-decoration: none; min-width: auto; background: transparent;" (click)="goBack()" title="Volver">
+      <div class="d-flex align-items-center mb-3 position-relative">
+        <button class="btn btn-link p-0 text-white position-absolute start-0" style="text-decoration: none; min-width: auto; background: transparent; z-index: 10;" (click)="goBack()" title="Volver">
           <span class="material-icons">arrow_back</span>
         </button>
-        <div class="flex-grow-1 d-flex justify-content-center pe-4">
+        <div class="w-100 d-flex justify-content-center">
           <div class="d-inline-flex p-3 rounded-circle" style="color: var(--accent-color);">
             <span class="material-icons" style="font-size: 32px;">account_balance</span>
           </div>
