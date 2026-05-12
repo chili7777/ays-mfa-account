@@ -49,8 +49,8 @@
         <h3 class="text-danger h5 mb-2">Aviso del Sistema</h3>
         <p class="text-secondary small mb-4">{{errorMessage()}}</p>
           <button class="btn btn-secondary w-100" (click)="goBack()">
-            <span class="material-icons d-lg-none" style="font-size: 18px;">arrow_back</span>
-            <span class="d-none d-lg-inline">Volver al listado</span>
+            <span class="material-icons d-xl-none" style="font-size: 18px;">arrow_back</span>
+            <span class="d-none d-xl-inline">Volver al listado</span>
           </button>
       </div>
     } @else if (account(); as acc) {
@@ -103,11 +103,11 @@
         <div class="mt-5 d-flex gap-3">
           <button class="btn btn-warning flex-grow-1" (click)="goToEdit()">
             <span class="material-icons" style="font-size: 18px;">edit</span>
-            <span class="d-none d-lg-inline">Editar</span>
+            <span class="d-none d-xl-inline">Editar</span>
           </button>
           <button class="btn btn-danger flex-grow-1" (click)="confirmDelete(acc.id)">
             <span class="material-icons" style="font-size: 18px;">delete</span>
-            <span class="d-none d-lg-inline">Eliminar</span>
+            <span class="d-none d-xl-inline">Eliminar</span>
           </button>
         </div>
       </div>
@@ -128,12 +128,12 @@
 
     <div class="d-flex gap-3">
       <button class="btn btn-secondary flex-grow-1" (click)="showDeleteModal.set(false)">
-        <span class="material-icons d-lg-none" style="font-size: 18px;">close</span>
-        <span class="d-none d-lg-inline">Cancelar</span>
+        <span class="material-icons d-xl-none" style="font-size: 18px;">close</span>
+        <span class="d-none d-xl-inline">Cancelar</span>
       </button>
       <button class="btn btn-danger flex-grow-1" (click)="onDelete()">
-        <span class="material-icons d-lg-none" style="font-size: 18px;">delete</span>
-        <span class="d-none d-lg-inline">Eliminar</span>
+        <span class="material-icons d-xl-none" style="font-size: 18px;">delete</span>
+        <span class="d-none d-xl-inline">Eliminar</span>
       </button>
     </div>
   </div>
