@@ -23,10 +23,10 @@
 
     <section class="list-section">
       <div class="d-flex justify-content-between align-items-center mb-4 px-2">
-        <h2 class="h5 mb-0">Cuentas</h2>
+        <h2 class="h5 mb-0">Mis Cuentas</h2>
         <button class="btn btn-success btn-sm" (click)="goToCreate()">
-          <span class="material-icons d-xxl-none" style="font-size: 18px;">add</span>
-          <span class="d-none d-xxl-inline">+ Nueva</span>
+          <span class="material-icons d-md-none" style="font-size: 18px;">add</span>
+          <span class="d-none d-md-inline">+ Nueva Cuenta</span>
         </button>
       </div>
 
@@ -40,85 +40,58 @@
         <p class="loading-text mb-0">Cargando cuentas...</p>
       </div>
 
-      <!-- Vista de Móvil: Lista minimalista -->
-      <div class="show-mobile-only" *ngIf="!loading()">
-        <div class="px-3 cursor-pointer" *ngFor="let account of filteredAccounts()" (click)="goToDetail(account.id)">
-          <div class="py-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid var(--border-color, rgba(43, 49, 57, 0.5));">
-            <div class="flex-grow-1">
-              <div class="d-flex align-items-center gap-2 mb-1">
-                <span [class]="account.status ? 'status-dot active' : 'status-dot'"></span>
-                <span class="fw-bold">{{maskAccountNumber(account.accountNumber)}}</span>
+      <!-- Nueva Vista de Tarjetas (Responsive Grid) -->
+      <div class="accounts-grid" *ngIf="!loading()">
+        <div class="account-item animate-fade-in" *ngFor="let account of filteredAccounts()" (click)="goToDetail(account.id)">
+          <div class="account-card-modern">
+            <!-- Parte Superior -->
+            <div class="card-top d-flex justify-content-between align-items-start">
+              <div class="account-id">
+                <span class="masked-number">{{maskAccountNumber(account.accountNumber)}}</span>
               </div>
-
-              <div class="text-secondary small mb-1">
-                {{account.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}}{{getCustomerName(account.clientId) ? ' | ' + getCustomerName(account.clientId) : ''}}
-              </div>
-
-              <!-- Toggle de Estado -->
-              <div class="d-flex align-items-center gap-2" style="margin-top: -2px;">
-                <span class="text-secondary small fw-medium" style="font-size: 10px;">{{ account.status ? 'Activa' : 'Inactiva' }}</span>
-                <label class="switch" style="transform: scale(0.65); transform-origin: left center;" (click)="$event.stopPropagation()" [title]="account.status ? 'Cuenta Activa - Haga clic para desactivar' : 'Cuenta Inactiva - Haga clic para activar'">
-                  <input type="checkbox" [checked]="account.status" (change)="toggleStatus(account)">
-                  <span class="slider"></span>
-                </label>
+              <div class="account-type-label">
+                {{getAccountTypeLabel(account.accountType)}}
               </div>
             </div>
-            <span class="material-icons text-secondary">chevron_right</span>
+
+            <!-- Parte Inferior -->
+            <div class="card-bottom d-flex justify-content-between align-items-end mt-4">
+              <div class="balance-info">
+                <span class="small-label">Saldo disponible</span>
+                <div class="balance-display mt-1">
+                  <span class="amount" [class.hidden]="!isBalancesVisible()">
+                    {{ isBalancesVisible() ? ((account.balance !== undefined ? account.balance : account.initialBalance) | currency) : '$ .*' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-actions-row d-flex align-items-center gap-3">
+                <button class="icon-btn-toggle" (click)="$event.stopPropagation(); toggleBalancesVisibility()" [title]="isBalancesVisible() ? 'Ocultar saldo' : 'Mostrar saldo'">
+                  <span class="material-icons">{{ isBalancesVisible() ? 'visibility' : 'visibility_off' }}</span>
+                </button>
+
+                <div class="status-indicator">
+                   <span [class]="account.status ? 'status-dot active' : 'status-dot'" [title]="account.status ? 'Activa' : 'Inactiva'"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones rápidas flotantes o al hover (opcional para mantener limpieza) -->
+            <div class="quick-actions">
+              <button class="btn-mini edit" (click)="$event.stopPropagation(); goToEdit(account.id)" title="Editar">
+                <span class="material-icons">edit</span>
+              </button>
+              <button class="btn-mini delete" (click)="$event.stopPropagation(); confirmDelete(account.id)" title="Eliminar">
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Vista de Escritorio: Tabla minimalista -->
-      <div class="hide-mobile" *ngIf="!loading()">
-        <table class="table">
-          <thead>
-            <tr>
-              <th><span class="grayscale-emoji">🔢</span> Número</th>
-              <th><span class="grayscale-emoji">🏦</span> Tipo</th>
-              <th><span class="grayscale-emoji">👤</span> Cliente</th>
-              <th class="text-center"><span class="grayscale-emoji">⚙️</span> Estado</th>
-              <th class="text-end" style="width: 120px;"><span class="grayscale-emoji">🛠️</span> Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let account of filteredAccounts()" (click)="goToDetail(account.id)" class="cursor-pointer">
-              <td>
-                <div class="d-flex align-items-center gap-2">
-                  <span [class]="account.status ? 'status-dot active' : 'status-dot'"></span>
-                  <span class="fw-bold">{{maskAccountNumber(account.accountNumber)}}</span>
-                </div>
-              </td>
-              <td>{{account.accountType === 'SAVINGS' ? 'Ahorros' : 'Corriente'}}</td>
-              <td class="small text-secondary">{{getCustomerName(account.clientId)}}</td>
-              <td class="text-center">
-                <div class="d-flex align-items-center justify-content-center gap-2">
-                  <span class="text-secondary small fw-medium">{{ account.status ? 'Activa' : 'Inactiva' }}</span>
-                  <label class="switch" style="transform: scale(0.8);" (click)="$event.stopPropagation()" [title]="account.status ? 'Activa' : 'Inactiva'">
-                    <input type="checkbox" [checked]="account.status" (change)="toggleStatus(account)">
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </td>
-              <td class="text-end">
-                <div class="d-flex justify-content-end gap-2">
-                  <button class="btn btn-warning btn-sm align-items-center gap-1" (click)="$event.stopPropagation(); goToEdit(account.id)" title="Editar">
-                    <span class="material-icons" style="font-size: 16px;">edit</span>
-                    <span class="d-none d-xxl-inline">Editar</span>
-                  </button>
-                  <button class="btn btn-danger btn-sm align-items-center gap-1" (click)="$event.stopPropagation(); confirmDelete(account.id)" title="Eliminar">
-                    <span class="material-icons" style="font-size: 16px;">delete</span>
-                    <span class="d-none d-xxl-inline">Eliminar</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
       <div *ngIf="!loading() && filteredAccounts().length === 0" class="empty-state">
         <div class="empty-icon-container">
-          <span class="material-icons" style="font-size: 64px; opacity: 0.2; color: var(--accent-color, #f0b90b);">account_balance_wallet</span>
+          <span class="material-icons" style="font-size: 64px; opacity: 0.5; color: var(--accent-light, #58a6ff);">account_balance_wallet</span>
         </div>
         <h3>No se encontraron cuentas</h3>
         <p>Intenta ajustar tu búsqueda o crea una nueva cuenta para comenzar a gestionar tus finanzas.</p>

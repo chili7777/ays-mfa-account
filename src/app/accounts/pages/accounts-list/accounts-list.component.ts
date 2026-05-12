@@ -27,6 +27,7 @@ export class AccountsListComponent implements OnInit {
   loading = signal<boolean>(false);
   showDeleteModal = signal<boolean>(false);
   deleteId = signal<string>('');
+  isBalancesVisible = signal<boolean>(false);
 
   filteredAccounts = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
@@ -58,8 +59,14 @@ export class AccountsListComponent implements OnInit {
 
   maskAccountNumber(num: string | undefined): string {
     if (!num) return '';
-    const last4 = num.slice(-4);
-    return `******${last4}`;
+    const last3 = num.slice(-3);
+    return `****${last3}`;
+  }
+
+  getAccountTypeLabel(type: string | undefined): string {
+    if (type === 'SAVINGS') return 'Cuenta Ahorros';
+    if (type === 'CURRENT') return 'Cuenta Transaccional';
+    return 'Cuenta';
   }
 
   loadAccounts(): void {
@@ -95,6 +102,10 @@ export class AccountsListComponent implements OnInit {
         alert('No se pudo actualizar el estado de la cuenta');
       }
     });
+  }
+
+  toggleBalancesVisibility(): void {
+    this.isBalancesVisible.update(v => !v);
   }
 
   goToCreate(): void {

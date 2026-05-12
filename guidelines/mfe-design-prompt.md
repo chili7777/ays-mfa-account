@@ -24,6 +24,7 @@ $theme-dark-surface-hover: #2b3139; /* Estados de hover */
 $theme-dark-text-primary: #eaecef;  /* Texto principal */
 $theme-dark-text-secondary: #848e9c; /* Texto de apoyo (Gris) */
 $theme-dark-accent: #005ce6;        /* Azul acento (Primarios) */
+$theme-dark-accent-light: #58a6ff;  /* Azul acento claro */
 $theme-dark-border: rgba(43, 49, 57, 0.5); /* Bordes sutiles */
 
 /* Colores Semánticos (Dark Style) */

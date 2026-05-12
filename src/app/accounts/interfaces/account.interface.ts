@@ -5,6 +5,7 @@ export interface Account {
   accountNumber: string;
   accountType: 'SAVINGS' | 'CURRENT';
   initialBalance: number;
+  balance?: number;
   status: boolean;
 }
 

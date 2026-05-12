@@ -18,6 +18,7 @@ html, body {
 
   /* Variables globales para uso en HTML/SVG */
   --accent-color: #{$theme-dark-accent};
+  --accent-light: #{$theme-dark-accent-light};
   --warning-color: #{$theme-dark-warning};
   --success-color: #{$theme-dark-success};
   --error-color: #{$theme-dark-error};
