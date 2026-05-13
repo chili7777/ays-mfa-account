@@ -8,6 +8,7 @@ import { CustomerService } from '../../services/customer.service';
 import { Account } from '../../interfaces/account.interface';
 import { Customer } from '../../interfaces/customer.interface';
 import { MfeBridgeService } from '../../../core/services/mfe-bridge.service';
+import { ErrorModelDto } from '../../../core/interfaces/error.interface';
 
 @Component({
   selector: 'app-accounts-list',
@@ -30,6 +31,7 @@ export class AccountsListComponent implements OnInit, OnDestroy {
   loading = signal<boolean>(false);
   showDeleteModal = signal<boolean>(false);
   deleteId = signal<string>('');
+  integrityError = signal<string | null>(null);
   isBalancesVisible = signal<boolean>(false);
 
   // Filtro de clientes (ADMIN)
@@ -267,6 +269,7 @@ export class AccountsListComponent implements OnInit, OnDestroy {
   confirmDelete(id: string | undefined): void {
     if (id) {
       this.deleteId.set(id);
+      this.integrityError.set(null);
       this.showDeleteModal.set(true);
     }
   }
@@ -274,11 +277,11 @@ export class AccountsListComponent implements OnInit, OnDestroy {
   onDelete(): void {
     const id = this.deleteId();
     if (id) {
+      this.integrityError.set(null);
       this.movementService.getAllMovements({ accountId: id }).subscribe({
         next: (movements) => {
           if (movements && movements.length > 0) {
-            alert('No se puede eliminar la cuenta porque tiene movimientos asociados.');
-            this.showDeleteModal.set(false);
+            this.integrityError.set("Esta cuenta no puede ser eliminada porque tiene movimientos registrados. Se recomienda desactivar su estado en lugar de eliminarla.");
             return;
           }
           this.executeDelete();
@@ -295,12 +298,17 @@ export class AccountsListComponent implements OnInit, OnDestroy {
       next: () => {
         this.accounts.update(prev => prev.filter(a => a.id !== this.deleteId()));
         this.showDeleteModal.set(false);
-        alert('Cuenta eliminada con éxito');
+        this.integrityError.set(null);
       },
       error: (err) => {
-        console.error('Error al eliminar', err);
-        alert('No se pudo eliminar la cuenta. ' + (err.error?.message || ''));
-        this.showDeleteModal.set(false);
+        const errorData: ErrorModelDto = err.error;
+        if (errorData?.detail === "No se puede eliminar o modificar el registro porque tiene información relacionada vinculada.") {
+          this.integrityError.set("Esta cuenta no puede ser eliminada porque tiene movimientos registrados. Se recomienda desactivar su estado en lugar de eliminarla.");
+        } else {
+          console.error('Error al eliminar', err);
+          alert('No se pudo eliminar la cuenta. ' + (err.error?.message || ''));
+          this.showDeleteModal.set(false);
+        }
       }
     });
   }

@@ -127,7 +127,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2">
         <div class="d-flex align-items-center gap-3">
           <h2 class="h5 mb-0">{{ isAdmin() ? 'Gestión de Cuentas' : 'Mis Cuentas' }}</h2>
-          <span class="role-badge" [class.admin-role]="isAdmin()">
+          <span class="role-badge" [class.admin-role]="isAdmin()" *ngIf="userRole() && userRole() !== 'USER'">
             <span class="material-icons" style="font-size: 14px;">{{ isAdmin() ? 'admin_panel_settings' : 'person' }}</span>
             {{ userRole() }}
           </span>
@@ -225,13 +225,19 @@
 <div *ngIf="showDeleteModal()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
   <div class="surface mx-3" style="width: 100%; max-width: 400px;">
     <h3 class="h5 mb-3">Eliminar cuenta</h3>
-    <p class="text-secondary mb-4">¿Estás seguro de que deseas eliminar esta cuenta permanentemente?</p>
+    <p class="text-secondary mb-4" *ngIf="!integrityError()">¿Estás seguro de que deseas eliminar esta cuenta permanentemente?</p>
+
+    <div *ngIf="integrityError()" class="alert alert-warning animate-fade-in mb-4" style="border-radius: 8px; display: flex; align-items: flex-start; gap: 10px; background: rgba(255, 171, 0, 0.1); border: 1px solid rgba(255, 171, 0, 0.2); color: #ffab00; padding: 12px;">
+      <span class="material-icons" style="font-size: 20px; margin-top: 2px;">warning</span>
+      <span class="small fw-medium">{{ integrityError() }}</span>
+    </div>
+
     <div class="d-flex justify-content-end gap-2">
       <button class="btn btn-secondary" (click)="showDeleteModal.set(false)">
         <span class="material-icons d-xxl-none" style="font-size: 18px;">close</span>
-        <span class="d-none d-xxl-inline">Cancelar</span>
+        <span class="d-none d-xxl-inline">{{ integrityError() ? 'Cerrar' : 'Cancelar' }}</span>
       </button>
-      <button class="btn btn-danger" (click)="onDelete()">
+      <button *ngIf="!integrityError()" class="btn btn-danger" (click)="onDelete()">
         <span class="material-icons d-xxl-none" style="font-size: 18px;">delete</span>
         <span class="d-none d-xxl-inline">Eliminar</span>
       </button>
