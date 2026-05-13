@@ -23,14 +23,17 @@
 
     <section class="list-section">
       <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2">
-        <h2 class="h5 mb-0">{{ userRole() === 'ADMIN' ? 'Gestión de Cuentas' : 'Mis Cuentas' }}</h2>
+        <h2 class="h5 mb-0">{{ isAdmin() ? 'Gestión de Cuentas' : 'Mis Cuentas' }}</h2>
         <div class="d-flex gap-2">
-          <button *ngIf="userRole() !== 'ADMIN'" class="btn btn-outline-primary btn-sm" (click)="goToClients()">
-            <span class="material-icons d-md-none" style="font-size: 18px;">people</span>
-            <span class="d-none d-md-inline">Clientes</span>
+          <!-- Botón de Clientes: Solo para ADMIN -->
+          <button *ngIf="isAdmin()" class="btn btn-outline-primary btn-sm" (click)="goToClients()" title="Gestionar Clientes">
+            <span class="material-icons d-md-none" style="font-size: 20px;">person_add</span>
+            <span class="d-none d-md-inline">+ Clientes</span>
           </button>
-          <button *ngIf="userRole() === 'ADMIN'" class="btn btn-success btn-sm" (click)="goToCreate()">
-            <span class="material-icons d-md-none" style="font-size: 18px;">add</span>
+
+          <!-- Botón de Nueva Cuenta: Para ADMIN y USER -->
+          <button class="btn btn-success btn-sm" (click)="goToCreate()" title="Aperturar nueva cuenta">
+            <span class="material-icons d-md-none" style="font-size: 20px;">add_card</span>
             <span class="d-none d-md-inline">+ Nueva Cuenta</span>
           </button>
         </div>
@@ -76,9 +79,9 @@
               <div class="card-actions-row d-flex align-items-center gap-2 gap-md-3">
                 <div class="status-indicator"
                      [class.active-status]="account.status"
-                     [class.no-click]="userRole() !== 'ADMIN'"
+                     [class.no-click]="!isAdmin()"
                      (click)="onStatusClick($event, account)"
-                     [title]="userRole() === 'ADMIN' ? (account.status ? 'Haga clic para desactivar' : 'Haga clic para activar') : ''">
+                     [title]="isAdmin() ? (account.status ? 'Haga clic para desactivar' : 'Haga clic para activar') : ''">
                    <span [class]="account.status ? 'status-dot active' : 'status-dot'"></span>
                    <span class="status-text ms-1">
                      {{ account.status ? 'Activo' : 'Inactivo' }}
@@ -88,7 +91,7 @@
             </div>
 
             <!-- Acciones rápidas flotantes o al hover (opcional para mantener limpieza) -->
-            <div class="quick-actions" *ngIf="userRole() === 'ADMIN'">
+            <div class="quick-actions" *ngIf="isAdmin()">
               <button class="btn-mini edit" (click)="$event.stopPropagation(); goToEdit(account.id)" title="Editar">
                 <span class="material-icons">edit</span>
               </button>

@@ -32,8 +32,10 @@ export class AccountFormComponent implements OnInit {
   selectedClientId = signal<string | null>(null);
   currentStep = signal<number>(1);
   totalSteps = 3;
-  userRole = signal<string>(localStorage.getItem('userRole') || 'USER');
+  userRole = signal<string>((localStorage.getItem('userRole') || 'USER').trim().toUpperCase());
   currentClientId = signal<string | null>(localStorage.getItem('clientId'));
+
+  isAdmin = computed(() => this.userRole() === 'ADMIN');
 
   filteredCustomers = computed(() => {
     const term = this.customerSearchTerm().toLowerCase().trim();
@@ -80,15 +82,25 @@ export class AccountFormComponent implements OnInit {
   }
 
   toggleCustomerDropdown(): void {
-    if (this.isEdit || this.userRole() !== 'ADMIN') return; // No permitir cambiar cliente
+    // Solo ADMIN puede cambiar el cliente en modo creación
+    if (this.isEdit || !this.isAdmin()) return;
+
     this.showCustomerDropdown.update(v => !v);
     if (this.showCustomerDropdown()) {
       this.customerSearchTerm.set('');
-      // Foco programático al abrir
+      // Foco programático al abrir con reintento para asegurar que el input esté en el DOM
       setTimeout(() => {
         const input = document.querySelector('.dropdown-panel input') as HTMLInputElement;
-        if (input) input.focus();
-      }, 100);
+        if (input) {
+          input.focus();
+        } else {
+          // Reintento si el primer intento falló (por delay de animación/render)
+          setTimeout(() => {
+            const retryInput = document.querySelector('.dropdown-panel input') as HTMLInputElement;
+            if (retryInput) retryInput.focus();
+          }, 50);
+        }
+      }, 150);
     }
   }
 
@@ -106,13 +118,29 @@ export class AccountFormComponent implements OnInit {
     this.loadCustomers();
     this.accountId = this.route.snapshot.paramMap.get('id');
 
-    // Si el usuario no es ADMIN, forzamos que la cuenta sea para él mismo
-    if (this.userRole() !== 'ADMIN' && !this.accountId) {
+    // Suscribirse a queryParams para capturar el clientId si viene en la URL
+    this.route.queryParams.subscribe(params => {
+      const cid = params['clientId'] || params['client'];
+      if (cid && !this.accountId) {
+        this.selectedClientId.set(cid);
+        this.accountForm.patchValue({ clientId: cid });
+
+        // Si no es ADMIN, bloqueamos el campo
+        if (!this.isAdmin()) {
+          this.accountForm.get('clientId')?.disable();
+        }
+      }
+    });
+
+    // Si el usuario no es ADMIN y estamos creando, y no vino por URL, usamos localStorage
+    if (!this.isAdmin() && !this.accountId && !this.selectedClientId()) {
       const cid = this.currentClientId();
       if (cid) {
         this.selectedClientId.set(cid);
         this.accountForm.patchValue({ clientId: cid });
         this.accountForm.get('clientId')?.disable();
+      } else {
+        console.warn('USER role detected but no clientId found in localStorage or URL');
       }
     }
 

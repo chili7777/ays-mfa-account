@@ -29,14 +29,16 @@ export class AccountsListComponent implements OnInit {
   showDeleteModal = signal<boolean>(false);
   deleteId = signal<string>('');
   isBalancesVisible = signal<boolean>(false);
-  userRole = signal<string>(localStorage.getItem('userRole') || 'USER');
-  currentClientId = signal<string | null>(null);
+  userRole = signal<string>((localStorage.getItem('userRole') || 'USER').trim().toUpperCase());
+  currentClientId = signal<string | null>(localStorage.getItem('clientId'));
+
+  isAdmin = computed(() => this.userRole() === 'ADMIN');
 
   filteredAccounts = computed(() => {
     let list = this.accounts();
 
     // Filtro por rol y clientId
-    if (this.userRole() !== 'ADMIN' && this.currentClientId()) {
+    if (!this.isAdmin() && this.currentClientId()) {
       list = list.filter(a => a.clientId === this.currentClientId());
     }
 
@@ -117,7 +119,7 @@ export class AccountsListComponent implements OnInit {
 
   onStatusClick(event: MouseEvent, account: Account): void {
     event.stopPropagation();
-    if (this.userRole() === 'ADMIN') {
+    if (this.isAdmin()) {
       this.toggleStatus(account);
     }
   }
@@ -144,7 +146,11 @@ export class AccountsListComponent implements OnInit {
   }
 
   goToCreate(): void {
-    this.router.navigate(['/accounts/create']);
+    const queryParams: any = {};
+    if (this.currentClientId()) {
+      queryParams.client = this.currentClientId();
+    }
+    this.router.navigate(['/accounts/create'], { queryParams });
   }
 
   goToEdit(id: string | undefined): void {

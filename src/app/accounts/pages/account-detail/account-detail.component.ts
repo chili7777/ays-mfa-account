@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../services/account.service';
@@ -26,7 +26,8 @@ export class AccountDetailComponent implements OnInit {
   loading = signal(true);
   errorMessage = signal<string | null>(null);
   showDeleteModal = signal(false);
-  userRole = signal<string>(localStorage.getItem('userRole') || 'USER');
+  userRole = signal<string>((localStorage.getItem('userRole') || 'USER').trim().toUpperCase());
+  isAdmin = computed(() => this.userRole() === 'ADMIN');
   currentClientId = signal<string | null>(null);
 
   ngOnInit(): void {
