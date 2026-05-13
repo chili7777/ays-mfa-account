@@ -104,10 +104,11 @@ export class AccountsListComponent implements OnInit {
     this.loadCustomers();
     // Verificamos parámetros de URL para compatibilidad con navegación manual
     this.route.queryParams.subscribe(params => {
-      const clientId = params['client'] || params['clientId'];
-      if (this.isAdmin()) {
-        // Seteamos el filtro (o lo limpiamos si no viene en la URL)
-        this.selectedClientIdFilter.set(clientId || '');
+      const clientId = params['client'] || params['clientId'] || params['uuid'];
+      console.log('[Accounts List] QueryParams recibidos:', params, 'Filtro a aplicar:', clientId);
+
+      if (clientId) {
+        this.selectedClientIdFilter.set(clientId);
       }
     });
   }
