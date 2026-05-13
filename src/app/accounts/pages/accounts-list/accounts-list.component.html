@@ -6,17 +6,17 @@
         <div class="col-12">
           <div class="d-flex gap-2 h-100">
             <div class="position-relative w-100">
-              <span class="material-icons position-absolute top-50 translate-middle-y ms-3 text-secondary" style="font-size: 18px;">search</span>
+              <span class="material-icons position-absolute top-50 translate-middle-y ms-4 text-secondary" style="font-size: 20px;">search</span>
               <input
                 type="text"
-                class="form-control ps-5 h-100"
-                placeholder="Buscar cuenta (número, tipo o cliente)..."
+                class="form-control search-bar-pill"
+                placeholder="Buscar cuenta por número, tipo o cliente..."
                 [ngModel]="searchTerm()"
                 (ngModelChange)="searchTerm.set($event)"
                 (keyup.enter)="onSearch()"
               >
             </div>
-            <button class="btn btn-primary h-100" type="button" (click)="onSearch()">
+            <button class="btn btn-primary btn-pill" type="button" (click)="onSearch()">
               <span class="material-icons d-xxl-none">search</span>
               <span class="d-none d-xxl-inline">Buscar</span>
             </button>

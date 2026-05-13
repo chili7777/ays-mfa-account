@@ -36,7 +36,7 @@
     </header>
 
     @if (loading()) {
-      <div class="surface-alt p-5 shadow-sm text-center">
+      <div class="surface-alt p-5 shadow-sm text-center rounded-20">
         <div class="modern-loader mx-auto mb-4">
           <div class="ring"></div>
           <div class="ring"></div>
@@ -46,7 +46,7 @@
         <p class="loading-text mb-0">Obteniendo datos...</p>
       </div>
     } @else if (errorMessage()) {
-      <div class="surface-alt p-5 shadow-sm text-center">
+      <div class="surface-alt p-5 shadow-sm text-center rounded-20">
         <div class="empty-icon-container mx-auto mb-4" style="border-color: rgba(212, 16, 32, 0.2); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid;">
           <span class="material-icons text-danger" style="font-size: 40px;">warning</span>
         </div>
@@ -58,7 +58,7 @@
           </button>
       </div>
     } @else if (account(); as acc) {
-      <div class="surface-alt p-4 shadow-sm">
+      <div class="surface-alt p-4 shadow-sm rounded-20">
         <div class="mb-4">
           <label class="text-secondary small d-flex align-items-center gap-2 mb-2">
             <span class="material-icons" style="font-size: 14px; opacity: 0.5;">numbers</span>
@@ -123,7 +123,7 @@
 
 <!-- Modal de Eliminación - Estilo Surface -->
 <div *ngIf="showDeleteModal()" class="animate-fade-in" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-  <div class="surface-alt p-4 mx-3 w-100 shadow-lg" style="max-width: 400px; border-radius: 12px;">
+  <div class="surface-alt p-4 mx-3 w-100 shadow-lg rounded-20" style="max-width: 400px;">
     <div class="text-center mb-4">
       <div class="d-inline-flex p-3 rounded-circle mb-3" style="color: var(--error-color); background: rgba(212, 16, 32, 0.1);">
         <span class="material-icons" style="font-size: 32px;">warning</span>

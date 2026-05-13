@@ -1,0 +1,19 @@
+.rounded-20 {
+  border-radius: 20px !important;
+}
+
+.cursor-help {
+  cursor: help;
+}
+
+.form-control {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.01);
+  padding: 12px 0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  }
+}
