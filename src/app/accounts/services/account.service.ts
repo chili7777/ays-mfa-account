@@ -11,6 +11,7 @@ export class AccountService {
 
   // URL base unificada para Cloud y Local (se prefiere Cloud para que funcione en el despliegue)
   private readonly apiUrl = 'https://ays-msa-dm-cuaa-cr-account-stagi-zdpms.ondigitalocean.app/accounts';
+  private readonly customerUrl = 'https://ays-msa-dm-cuaa-cr-account-stagi-zdpms.ondigitalocean.app/customers';
 
   private getHeaders(isJson = false): HttpHeaders {
     const headers: any = {
@@ -29,23 +30,33 @@ export class AccountService {
   getAllAccounts(): Observable<Account[]> {
     console.log('Llamando a getAllAccounts en:', this.apiUrl);
     return this.http.get<any>(this.apiUrl, { headers: this.getHeaders() }).pipe(
-      map(response => {
-        console.log('Respuesta de getAllAccounts:', response);
-        let data = [];
-        if (Array.isArray(response)) {
-          data = response;
-        } else if (response && response.data && Array.isArray(response.data)) {
-          data = response.data;
-        } else if (response && response.accounts && Array.isArray(response.accounts)) {
-          data = response.accounts;
-        }
-
-        return data.map((acc: any) => ({
-          ...acc,
-          id: acc.id || acc.accountId // Normalizar ID por si la API usa accountId
-        }));
-      })
+      map(response => this.mapAccountsResponse(response))
     );
+  }
+
+  getAccountsByClientId(clientId: string): Observable<Account[]> {
+    const url = `${this.customerUrl}/${clientId}/accounts`;
+    console.log('Llamando a getAccountsByClientId en:', url);
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
+      map(response => this.mapAccountsResponse(response))
+    );
+  }
+
+  private mapAccountsResponse(response: any): Account[] {
+    console.log('Respuesta de la API de cuentas:', response);
+    let data = [];
+    if (Array.isArray(response)) {
+      data = response;
+    } else if (response && response.data && Array.isArray(response.data)) {
+      data = response.data;
+    } else if (response && response.accounts && Array.isArray(response.accounts)) {
+      data = response.accounts;
+    }
+
+    return data.map((acc: any) => ({
+      ...acc,
+      id: acc.id || acc.accountId // Normalizar ID por si la API usa accountId
+    }));
   }
 
   getAccountById(accountId: string): Observable<Account> {

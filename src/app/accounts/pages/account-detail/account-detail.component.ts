@@ -26,8 +26,17 @@ export class AccountDetailComponent implements OnInit {
   loading = signal(true);
   errorMessage = signal<string | null>(null);
   showDeleteModal = signal(false);
+  userRole = signal<string>(localStorage.getItem('userRole') || 'USER');
+  currentClientId = signal<string | null>(null);
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const cid = params['clientId'] || params['client'];
+      if (cid) {
+        this.currentClientId.set(cid);
+      }
+    });
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadAccount(id);
@@ -151,6 +160,10 @@ export class AccountDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/accounts']);
+    const queryParams: any = {};
+    if (this.currentClientId()) {
+      queryParams.client = this.currentClientId();
+    }
+    this.router.navigate(['/accounts'], { queryParams });
   }
 }

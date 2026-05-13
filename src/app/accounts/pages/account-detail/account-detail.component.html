@@ -23,7 +23,7 @@
         <div class="d-flex justify-content-center align-items-center gap-2 animate-fade-in mb-2">
           <span [class]="acc.status ? 'status-dot active' : 'status-dot'" [title]="acc.status ? 'La cuenta se encuentra operativa' : 'La cuenta está restringida'"></span>
           <span class="text-secondary small fw-medium">{{ acc.status ? 'Activo' : 'Inactivo' }}</span>
-          <label class="switch" style="transform: scale(0.7);" [title]="acc.status ? 'Desactivar cuenta' : 'Activar cuenta'">
+          <label *ngIf="userRole() === 'ADMIN'" class="switch" style="transform: scale(0.7);" [title]="acc.status ? 'Desactivar cuenta' : 'Activar cuenta'">
             <input type="checkbox" [checked]="acc.status" (change)="toggleStatus()">
             <span class="slider"></span>
           </label>
@@ -103,7 +103,7 @@
           </div>
         </div>
 
-        <div class="mt-5 d-flex gap-3">
+        <div *ngIf="userRole() === 'ADMIN'" class="mt-5 d-flex gap-3">
           <button class="btn btn-warning flex-grow-1" (click)="goToEdit()">
             <span class="material-icons" style="font-size: 18px;">edit</span>
             <span class="d-none d-xxl-inline">Editar</span>

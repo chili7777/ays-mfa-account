@@ -24,10 +24,16 @@
     <section class="list-section">
       <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2">
         <h2 class="h5 mb-0">{{ userRole() === 'ADMIN' ? 'Gestión de Cuentas' : 'Mis Cuentas' }}</h2>
-        <button class="btn btn-success btn-sm" (click)="goToCreate()">
-          <span class="material-icons d-md-none" style="font-size: 18px;">add</span>
-          <span class="d-none d-md-inline">+ Nueva Cuenta</span>
-        </button>
+        <div class="d-flex gap-2">
+          <button *ngIf="userRole() !== 'ADMIN'" class="btn btn-outline-primary btn-sm" (click)="goToClients()">
+            <span class="material-icons d-md-none" style="font-size: 18px;">people</span>
+            <span class="d-none d-md-inline">Clientes</span>
+          </button>
+          <button *ngIf="userRole() === 'ADMIN'" class="btn btn-success btn-sm" (click)="goToCreate()">
+            <span class="material-icons d-md-none" style="font-size: 18px;">add</span>
+            <span class="d-none d-md-inline">+ Nueva Cuenta</span>
+          </button>
+        </div>
       </div>
 
       <div *ngIf="loading()" class="spinner-container py-5">

@@ -30,10 +30,13 @@ export class CustomerService {
           data = response.customers;
         }
 
-        return data.map(c => ({
-          ...c,
-          id: c.id || c.customerId || c.idCustomer || c.identification // Fallback a identificación si no hay ID
-        }));
+        return data.map(c => {
+          const uuid = c.uuid || c.id || c.customerId || c.idCustomer || c._id;
+          return {
+            ...c,
+            id: uuid || c.identification
+          };
+        });
       })
     );
   }
@@ -42,9 +45,10 @@ export class CustomerService {
     return this.http.get<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() }).pipe(
       map(response => {
         const data = response.data || response.customer || response;
+        const uuid = data.uuid || data.id || data.customerId || data.idCustomer || data._id;
         return {
           ...data,
-          id: data.id || data.customerId || data.idCustomer || id
+          id: uuid || id
         };
       })
     );

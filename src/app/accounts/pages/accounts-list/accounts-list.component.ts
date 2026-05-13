@@ -59,10 +59,12 @@ export class AccountsListComponent implements OnInit {
         // Si no viene por query param, intentar de localStorage
         this.currentClientId.set(localStorage.getItem('clientId'));
       }
+
+      // Cargar cuentas después de tener el clientId
+      this.loadAccounts();
     });
 
     this.loadCustomers();
-    this.loadAccounts();
   }
 
   loadCustomers(): void {
@@ -91,7 +93,13 @@ export class AccountsListComponent implements OnInit {
 
   loadAccounts(): void {
     this.loading.set(true);
-    this.accountService.getAllAccounts().subscribe({
+    const clientId = this.currentClientId();
+
+    const obs$ = (clientId)
+      ? this.accountService.getAccountsByClientId(clientId)
+      : this.accountService.getAllAccounts();
+
+    obs$.subscribe({
       next: (data) => {
         this.accounts.set(data);
         this.loading.set(false);
@@ -147,8 +155,16 @@ export class AccountsListComponent implements OnInit {
 
   goToDetail(id: string | undefined): void {
     if (id) {
-      this.router.navigate(['/accounts/detail', id]);
+      const queryParams: any = {};
+      if (this.currentClientId()) {
+        queryParams.client = this.currentClientId();
+      }
+      this.router.navigate(['/accounts/detail', id], { queryParams });
     }
+  }
+
+  goToClients(): void {
+    this.router.navigate(['/clients']);
   }
 
   confirmDelete(id: string | undefined): void {
