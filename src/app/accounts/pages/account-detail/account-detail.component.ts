@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../services/account.service';
@@ -15,7 +15,7 @@ import { MfeBridgeService } from '../../../core/services/mfe-bridge.service';
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss'
 })
-export class AccountDetailComponent implements OnInit {
+export class AccountDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
@@ -34,7 +34,15 @@ export class AccountDetailComponent implements OnInit {
   isAdmin = computed(() => this.userRole().includes('ADMIN'));
   currentClientId = computed(() => this.mfeBridge.sessionData().clientId);
 
+  private readonly refreshHandler = () => {
+    const currentAccount = this.account();
+    if (currentAccount && currentAccount.id) {
+      this.loadAccount(currentAccount.id);
+    }
+  };
+
   ngOnInit(): void {
+    window.addEventListener('refresh-balances', this.refreshHandler);
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadAccount(id);
@@ -42,6 +50,10 @@ export class AccountDetailComponent implements OnInit {
       this.errorMessage.set('No se proporcionó un ID de cuenta válido');
       this.loading.set(false);
     }
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('refresh-balances', this.refreshHandler);
   }
 
   loadAccount(id: string): void {

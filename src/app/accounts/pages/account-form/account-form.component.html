@@ -35,6 +35,22 @@
     </header>
 
     <div class="surface-alt p-4 shadow-sm">
+      <!-- Mensajes de Notificación -->
+      @if (errorMessage()) {
+        <div class="alert alert-danger d-flex align-items-center animate-fade-in mb-4" role="alert">
+          <span class="material-icons me-3">error_outline</span>
+          <div class="flex-grow-1 small">{{ errorMessage() }}</div>
+          <button type="button" class="btn-close ms-2" style="font-size: 0.7rem;" (click)="errorMessage.set(null)"></button>
+        </div>
+      }
+      @if (successMessage()) {
+        <div class="alert alert-success d-flex align-items-center animate-fade-in mb-4" role="alert">
+          <span class="material-icons me-3">check_circle_outline</span>
+          <div class="flex-grow-1 small">{{ successMessage() }}</div>
+          <button type="button" class="btn-close ms-2" style="font-size: 0.7rem;" (click)="successMessage.set(null)"></button>
+        </div>
+      }
+
       <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
 
         <!-- PASO 1: Cliente y Número -->
@@ -90,6 +106,9 @@
             <div class="invalid-feedback animate-fade-in" *ngIf="f['clientId'].errors?.['required'] && f['clientId'].touched">
               Debe seleccionar un cliente
             </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['clientId'].errors?.['notFound'] && f['clientId'].touched">
+              El cliente seleccionado no existe en el sistema
+            </div>
 
             <!-- Overlay para cerrar al hacer click fuera -->
             <div *ngIf="showCustomerDropdown()" class="dropdown-overlay" (click)="showCustomerDropdown.set(false)"></div>
@@ -115,6 +134,9 @@
             </div>
             <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['maxlength'] && f['accountNumber'].touched">
               No puede tener más de 10 dígitos
+            </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['duplicate'] && f['accountNumber'].touched">
+              Este número de cuenta ya está registrado
             </div>
           </div>
         </div>

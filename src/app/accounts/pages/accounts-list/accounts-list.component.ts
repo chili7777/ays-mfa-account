@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -16,7 +16,7 @@ import { MfeBridgeService } from '../../../core/services/mfe-bridge.service';
   templateUrl: './accounts-list.component.html',
   styleUrl: './accounts-list.component.scss'
 })
-export class AccountsListComponent implements OnInit {
+export class AccountsListComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly accountService = inject(AccountService);
@@ -43,6 +43,7 @@ export class AccountsListComponent implements OnInit {
   currentClientId = computed(() => this.mfeBridge.sessionData().clientId);
 
   private initialLoadDone = false;
+  private readonly refreshHandler = () => this.loadAccounts();
 
   constructor() {
     effect(() => {
@@ -110,6 +111,7 @@ export class AccountsListComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    window.addEventListener('refresh-balances', this.refreshHandler);
     // Verificamos parámetros de URL para compatibilidad con navegación manual
     this.route.queryParams.subscribe(params => {
       const clientId = params['client'] || params['clientId'] || params['uuid'];
@@ -118,6 +120,10 @@ export class AccountsListComponent implements OnInit {
         this.selectedClientIdFilter.set(clientId);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('refresh-balances', this.refreshHandler);
   }
 
   loadCustomers(): void {

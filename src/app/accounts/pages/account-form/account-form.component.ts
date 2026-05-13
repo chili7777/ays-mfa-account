@@ -34,6 +34,8 @@ export class AccountFormComponent implements OnInit {
   selectedClientId = signal<string | null>(null);
   currentStep = signal<number>(1);
   totalSteps = 3;
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
 
   // Datos sincronizados desde el Bridge
   userRole = computed(() => (this.mfeBridge.sessionData().role || 'USER').toUpperCase());
@@ -181,7 +183,7 @@ export class AccountFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar la cuenta', err);
-        alert('No se pudo cargar la información de la cuenta');
+        this.showErrorMessage('No se pudo cargar la información de la cuenta');
         this.goBack();
       }
     });
@@ -211,7 +213,7 @@ export class AccountFormComponent implements OnInit {
   onSubmit(): void {
     if (this.accountForm.invalid) {
       this.accountForm.markAllAsTouched();
-      alert('Por favor, complete todos los campos requeridos correctamente.');
+      this.showErrorMessage('Por favor, complete todos los campos requeridos correctamente.');
       return;
     }
 
@@ -232,21 +234,27 @@ export class AccountFormComponent implements OnInit {
 
       this.accountService.patchAccount(updateData, this.accountId!).subscribe({
         next: () => {
-          alert('Cuenta actualizada correctamente');
-          this.goBack();
+          this.showSuccessMessage('Cuenta actualizada correctamente');
+          setTimeout(() => this.goBack(), 1500);
         },
         error: (err) => {
           console.error('Error al actualizar con PATCH', err);
           // Si falla PATCH, intentamos con PUT como fallback (objeto completo)
           this.accountService.updateAccount(formValue, this.accountId!).subscribe({
             next: () => {
-              alert('Cuenta actualizada correctamente');
-              this.goBack();
+              this.showSuccessMessage('Cuenta actualizada correctamente');
+              setTimeout(() => this.goBack(), 1500);
             },
             error: (errPut) => {
               console.error('Error al actualizar con PUT', errPut);
               const errorMsg = errPut.error?.detail || errPut.error?.message || 'Error al actualizar la cuenta';
-              alert(errorMsg);
+
+              if (errorMsg.includes('número de cuenta ya existe')) {
+                this.accountForm.get('accountNumber')?.setErrors({ duplicate: true });
+                this.currentStep.set(1);
+              }
+
+              this.showErrorMessage(errorMsg);
             }
           });
         }
@@ -254,15 +262,41 @@ export class AccountFormComponent implements OnInit {
     } else {
       this.accountService.createAccount(formValue).subscribe({
         next: () => {
-          alert('Cuenta creada correctamente');
-          this.goBack(true); // Redirección limpia para ver todas las cuentas (especialmente para ADMIN)
+          this.showSuccessMessage('Cuenta creada correctamente');
+          setTimeout(() => this.goBack(true), 1500);
         },
         error: (err) => {
           console.error('Error al crear', err);
-          alert('Error al crear la cuenta');
+          const errorMsg = err.error?.detail || err.error?.message || 'Error al crear la cuenta';
+
+          if (errorMsg.includes('número de cuenta ya existe')) {
+            this.accountForm.get('accountNumber')?.setErrors({ duplicate: true });
+            this.currentStep.set(1);
+          } else if (errorMsg.includes('no existe')) {
+            // Caso de integridad: el cliente no existe
+            this.accountForm.get('clientId')?.setErrors({ notFound: true });
+            this.currentStep.set(1);
+            alert('Debe seleccionar un cliente válido para crear la cuenta');
+          }
+
+          this.showErrorMessage(errorMsg);
         }
       });
     }
+  }
+
+  private showErrorMessage(message: string): void {
+    this.errorMessage.set(message);
+    setTimeout(() => {
+      if (this.errorMessage() === message) this.errorMessage.set(null);
+    }, 8000);
+  }
+
+  private showSuccessMessage(message: string): void {
+    this.successMessage.set(message);
+    setTimeout(() => {
+      if (this.successMessage() === message) this.successMessage.set(null);
+    }, 5000);
   }
 
   goBack(clean: boolean = false): void {
