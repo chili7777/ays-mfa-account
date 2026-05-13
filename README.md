@@ -1,99 +1,77 @@
-# ays-mfa-account
+# AYS MFA Account Management
 
-Angular micro-frontend for MFA account features.
+Este es el micro-frontend (MFE) de gestión de cuentas bancarias para el ecosistema AYS. Permite la visualización, creación, edición y filtrado avanzado de cuentas, integrando un sistema de roles y seguridad bancaria.
 
-The app renders:
-- `ays-mfa-account`
-- `Micro-frontend loaded successfully.`
+## 🚀 Despliegue en DigitalOcean
 
-It is containerized for deployment in DigitalOcean App Platform and served by Nginx on port `80` with SPA fallback to `index.html`.
+El proyecto se encuentra desplegado y operativo en la siguiente URL:
+- **URL Principal (Login/Shell):** [https://ays-shl-account-manage-35jnj.ondigitalocean.app/login](https://ays-shl-account-manage-35jnj.ondigitalocean.app/login)
 
-## Prerequisites
+## 🏗️ Arquitectura
 
-- Node.js and npm
-- Docker
-- A GitHub account with access to GHCR (`ghcr.io`)
+El proyecto sigue una arquitectura de **Micro-frontends**, donde este repositorio contiene la lógica específica de cuentas.
 
-## Install dependencies
+### Componentes Clave:
+- **Angular 21**: Uso intensivo de **Signals** para una reactividad fina y eficiente.
+- **MFE Bridge**: Comunicación bidireccional entre la Shell y el MFE mediante `postMessage` y un servicio de puente dedicado (`MfeBridgeService`).
+- **RBAC (Role-Based Access Control)**: Gestión de permisos basada en roles (`ADMIN` y `USER`).
+- **SCSS Modular**: Estilos premium con soporte para temas oscuros y diseños responsivos.
 
+### Estructura del Proyecto:
+- `src/app/accounts`: Módulo principal de cuentas.
+  - `/pages`: Vistas de listado, detalle y formulario.
+  - `/services`: Lógica de comunicación con APIs de cuentas, clientes y movimientos.
+  - `/interfaces`: Definiciones de modelos de datos.
+- `src/app/core`: Servicios compartidos, incluyendo el puente MFE.
+
+## 🛠️ Requisitos Previos
+
+- **Node.js**: v20+ (recomendado v22+)
+- **npm**: v11+
+- **Docker**: Para ejecución y despliegue en contenedores.
+
+## 💻 Ejecución Local
+
+### 1. Clonar e Instalar dependencias
 ```bash
 npm install
 ```
 
-## Production build
-
+### 2. Servir la aplicación
 ```bash
-npm run build -- --configuration production
+npm run start
+```
+La aplicación estará disponible en `http://localhost:4201` (o el puerto configurado). *Nota: Al ser un MFE, requiere que la Shell esté activa para la funcionalidad completa de sesión.*
+
+### 3. Pruebas Unitarias
+```bash
+npm run test
+```
+El proyecto utiliza **Vitest** para una ejecución de pruebas ultrarrápida.
+
+## 🐳 Docker y Contenedores
+
+El proyecto está preparado para ejecutarse en entornos productivos mediante Docker.
+
+### Construir Imagen
+```bash
+docker build -f deploy/Dockerfile -t ays-mfa-account:latest .
 ```
 
-Build output is generated in `dist/ays-mfa-account/browser`.
-
-## Docker build
-
-```bash
-docker build -f deploy/Dockerfile -t ghcr.io/chili7777/ays-mfa-account:staging-latest .
-```
-
-## Docker run local
-
-```bash
-docker run --rm -p 8081:80 ghcr.io/chili7777/ays-mfa-account:staging-latest
-```
-
-Open `http://localhost:8081`.
-
-## Docker Compose run local
-
+### Ejecutar con Docker Compose
 ```bash
 docker compose up --build
 ```
 
-Stop the container:
+## 📝 Consideraciones Importantes
 
-```bash
-docker compose down
-```
+1.  **Seguridad de Datos**: Los saldos se ocultan/muestran mediante una funcionalidad de privacidad (icono de ojo) que aplica máscaras visuales.
+2.  **Validación de Negocio**: No se permite actualizar el saldo inicial de cuentas que ya registran movimientos bancarios.
+3.  **Filtrado Admin**: Los usuarios con rol `ADMIN` tienen acceso a filtros avanzados por titular y estado de cuenta, además de poder ver todas las cuentas del sistema.
+4.  **Integración de APIs**:
+    - **Accounts API**: `https://ays-msa-dm-cuaa-cr-account-stagi-zdpms.ondigitalocean.app/account`
+    - **Customers API**: `https://ays-msa-dm-cuaa-cr-account-stagi-zdpms.ondigitalocean.app/customers`
+    - **Movements API**: `https://ays-msa-dm-cuaa-cr-account-stagi-zdpms.ondigitalocean.app/movements`
 
-## GHCR push
-
-```bash
-docker login ghcr.io
-docker push ghcr.io/chili7777/ays-mfa-account:staging-latest
-```
-
-## DigitalOcean App Platform setup
-
-Create a new app using **Container Image**:
-
-1. Source type: `Container Image`
-2. Registry provider: `GitHub Container Registry`
-3. Repository: `chili7777/ays-mfa-account`
-4. Tag: `staging-latest`
-5. HTTP Port: `80`
-6. Health check path: `/`
-
-After deploy, set this env var in the shell app:
-
-- `AYS_MFA_ACCOUNT_URL=https://<your-ays-mfa-account-domain>`
-
-Then redeploy the shell app.
-
-## GitHub Actions deployment workflow
-
-This repo includes `.github/workflows/deploy-branches.yml`.
-
-Push behavior:
-- `feature/**` -> `staging`
-- `develop` -> `development`
-- `main` or `master` -> `production`
-
-Required repository secrets:
-- `DIGITALOCEAN_ACCESS_TOKEN`
-- `DO_APP_ID_STAGING`
-- `DO_APP_ID_DEVELOPMENT`
-- `DO_APP_ID_PRODUCTION`
-
-## Project deployment files
-
-- `deploy/Dockerfile`: multi-stage build (Node build + Nginx runtime)
-- `deploy/nginx.conf`: SPA fallback (`try_files $uri $uri/ /index.html`)
+---
+© 2026 AYS - Soluciones Financieras

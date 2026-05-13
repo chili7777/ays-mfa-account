@@ -199,7 +199,6 @@ export class AccountsListComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al cambiar estado', err);
-        alert('No se pudo actualizar el estado de la cuenta');
       }
     });
   }

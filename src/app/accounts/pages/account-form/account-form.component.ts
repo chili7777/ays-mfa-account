@@ -239,7 +239,8 @@ export class AccountFormComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al actualizar con PATCH', err);
-          // Si falla PATCH, intentamos con PUT como fallback (objeto completo)
+          this.handleFormErrors(err);
+          // Si falla PATCH, intentamos con PUT como fallback
           this.accountService.updateAccount(formValue, this.accountId!).subscribe({
             next: () => {
               this.showSuccessMessage('Cuenta actualizada correctamente');
@@ -247,13 +248,8 @@ export class AccountFormComponent implements OnInit {
             },
             error: (errPut) => {
               console.error('Error al actualizar con PUT', errPut);
+              this.handleFormErrors(errPut);
               const errorMsg = errPut.error?.detail || errPut.error?.message || 'Error al actualizar la cuenta';
-
-              if (errorMsg.includes('número de cuenta ya existe')) {
-                this.accountForm.get('accountNumber')?.setErrors({ duplicate: true });
-                this.currentStep.set(1);
-              }
-
               this.showErrorMessage(errorMsg);
             }
           });
@@ -267,21 +263,33 @@ export class AccountFormComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al crear', err);
+          this.handleFormErrors(err);
           const errorMsg = err.error?.detail || err.error?.message || 'Error al crear la cuenta';
-
-          if (errorMsg.includes('número de cuenta ya existe')) {
-            this.accountForm.get('accountNumber')?.setErrors({ duplicate: true });
-            this.currentStep.set(1);
-          } else if (errorMsg.includes('no existe')) {
-            // Caso de integridad: el cliente no existe
-            this.accountForm.get('clientId')?.setErrors({ notFound: true });
-            this.currentStep.set(1);
-            alert('Debe seleccionar un cliente válido para crear la cuenta');
-          }
-
           this.showErrorMessage(errorMsg);
         }
       });
+    }
+  }
+
+  private handleFormErrors(err: any): void {
+    const errorData = err.error;
+    if (errorData && errorData.errors) {
+      errorData.errors.forEach((e: any) => {
+        const message = e.message || '';
+        const fieldName = message.split(':')[0].trim();
+        const control = this.accountForm.get(fieldName);
+
+        if (control) {
+          control.setErrors({ serverError: e.businessMessage });
+          control.markAsTouched();
+        }
+      });
+
+      const step1Fields = ['clientId', 'accountNumber'];
+      const hasStep1Errors = errorData.errors.some((e: any) =>
+        step1Fields.some(field => e.message.includes(field))
+      );
+      if (hasStep1Errors) this.currentStep.set(1);
     }
   }
 

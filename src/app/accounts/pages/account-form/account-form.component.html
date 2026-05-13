@@ -109,6 +109,9 @@
             <div class="invalid-feedback animate-fade-in" *ngIf="f['clientId'].errors?.['notFound'] && f['clientId'].touched">
               El cliente seleccionado no existe en el sistema
             </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['clientId'].errors?.['serverError'] && f['clientId'].touched">
+              {{ f['clientId'].errors?.['serverError'] }}
+            </div>
 
             <!-- Overlay para cerrar al hacer click fuera -->
             <div *ngIf="showCustomerDropdown()" class="dropdown-overlay" (click)="showCustomerDropdown.set(false)"></div>
@@ -138,6 +141,9 @@
             <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['duplicate'] && f['accountNumber'].touched">
               Este número de cuenta ya está registrado
             </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['accountNumber'].errors?.['serverError'] && f['accountNumber'].touched">
+              {{ f['accountNumber'].errors?.['serverError'] }}
+            </div>
           </div>
         </div>
 
@@ -153,6 +159,9 @@
               <option value="SAVINGS">Ahorros (SAVINGS)</option>
               <option value="CURRENT">Corriente (CURRENT)</option>
             </select>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['accountType'].errors?.['serverError'] && f['accountType'].touched">
+              {{ f['accountType'].errors?.['serverError'] }}
+            </div>
           </div>
 
           <div class="mb-4">
@@ -172,6 +181,9 @@
             </div>
             <div class="invalid-feedback animate-fade-in" *ngIf="f['initialBalance'].errors?.['min'] && f['initialBalance'].touched">
               El saldo no puede ser negativo
+            </div>
+            <div class="invalid-feedback animate-fade-in" *ngIf="f['initialBalance'].errors?.['serverError'] && f['initialBalance'].touched">
+              {{ f['initialBalance'].errors?.['serverError'] }}
             </div>
 
             <!-- Mensaje de bloqueo por movimientos -->

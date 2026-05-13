@@ -113,7 +113,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al cambiar estado:', err);
-          this.errorMessage.set('No se pudo cambiar el estado de la cuenta.');
           this.loading.set(false);
         }
       });
@@ -162,7 +161,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al eliminar:', err);
-        this.errorMessage.set('No se pudo eliminar la cuenta. ' + (err.error?.message || ''));
         this.loading.set(false);
         this.showDeleteModal.set(false);
       }

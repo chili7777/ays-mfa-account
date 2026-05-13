@@ -70,6 +70,15 @@ export class MfeBridgeService {
     }, '*');
   }
 
+  /**
+   * Solicita a la Shell cerrar la sesión.
+   */
+  logout() {
+    window.parent.postMessage({ type: 'MFE_LOGOUT' }, '*');
+    // También navegamos localmente al login por si acaso
+    window.location.href = '/login';
+  }
+
   private isTrustedOrigin(origin: string): boolean {
     return this.trustedOrigins.includes(origin) ||
            origin.endsWith('.ondigitalocean.app') ||
