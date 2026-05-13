@@ -39,19 +39,28 @@ export class AccountsListComponent implements OnInit {
   statusFilter = signal<'all' | 'active' | 'inactive'>('all');
 
   // Sincronización vía Bridge
-  userRole = computed(() => (this.mfeBridge.sessionData().role || 'USER').toUpperCase());
+  userRole = computed(() => this.mfeBridge.sessionData().role?.toUpperCase() || null);
   currentClientId = computed(() => this.mfeBridge.sessionData().clientId);
+
+  private initialLoadDone = false;
 
   constructor() {
     effect(() => {
       // Recargar datos cuando cambie el rol o el clientId sincronizado
-      if (this.userRole()) {
+      if (this.userRole() && !this.initialLoadDone) {
+        this.initialLoadDone = true;
+        if (this.isAdmin()) {
+          this.loadCustomers();
+        }
         this.loadAccounts();
       }
     });
   }
 
-  isAdmin = computed(() => this.userRole().includes('ADMIN'));
+  isAdmin = computed(() => {
+    const role = this.userRole();
+    return role ? role.includes('ADMIN') || role.includes('GESTOR') || role.includes('ROOT') : false;
+  });
 
   dropdownCustomers = computed(() => {
     const term = this.customerSearchTerm().toLowerCase().trim();
@@ -101,11 +110,9 @@ export class AccountsListComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadCustomers();
     // Verificamos parámetros de URL para compatibilidad con navegación manual
     this.route.queryParams.subscribe(params => {
       const clientId = params['client'] || params['clientId'] || params['uuid'];
-      console.log('[Accounts List] QueryParams recibidos:', params, 'Filtro a aplicar:', clientId);
 
       if (clientId) {
         this.selectedClientIdFilter.set(clientId);
@@ -138,6 +145,7 @@ export class AccountsListComponent implements OnInit {
   }
 
   loadAccounts(): void {
+    if (!this.userRole()) return;
     this.loading.set(true);
 
     // Lógica de carga basada en rol
