@@ -42,9 +42,9 @@
             <div class="custom-select-container" [class.is-invalid]="f['clientId'].invalid && f['clientId'].touched">
               <div class="selected-value-box d-flex align-items-center justify-content-between form-control"
                    (click)="toggleCustomerDropdown()"
-                   [class.disabled]="isEdit">
+                   [class.disabled]="isEdit || userRole() !== 'ADMIN'">
                 <span [class.text-secondary]="!selectedClientId()">{{selectedCustomerName()}}</span>
-                <span class="material-icons opacity-50">{{showCustomerDropdown() ? 'expand_less' : 'expand_more'}}</span>
+                <span class="material-icons opacity-50">{{(showCustomerDropdown() && !isEdit && userRole() === 'ADMIN') ? 'expand_less' : 'expand_more'}}</span>
               </div>
 
               <!-- Dropdown Panel -->

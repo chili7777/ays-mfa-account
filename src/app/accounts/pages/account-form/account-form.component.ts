@@ -32,6 +32,8 @@ export class AccountFormComponent implements OnInit {
   selectedClientId = signal<string | null>(null);
   currentStep = signal<number>(1);
   totalSteps = 3;
+  userRole = signal<string>(localStorage.getItem('userRole') || 'USER');
+  currentClientId = signal<string | null>(localStorage.getItem('clientId'));
 
   filteredCustomers = computed(() => {
     const term = this.customerSearchTerm().toLowerCase().trim();
@@ -78,7 +80,7 @@ export class AccountFormComponent implements OnInit {
   }
 
   toggleCustomerDropdown(): void {
-    if (this.isEdit) return; // No permitir cambiar cliente en edición
+    if (this.isEdit || this.userRole() !== 'ADMIN') return; // No permitir cambiar cliente
     this.showCustomerDropdown.update(v => !v);
     if (this.showCustomerDropdown()) {
       this.customerSearchTerm.set('');
@@ -103,6 +105,17 @@ export class AccountFormComponent implements OnInit {
   ngOnInit(): void {
     this.loadCustomers();
     this.accountId = this.route.snapshot.paramMap.get('id');
+
+    // Si el usuario no es ADMIN, forzamos que la cuenta sea para él mismo
+    if (this.userRole() !== 'ADMIN' && !this.accountId) {
+      const cid = this.currentClientId();
+      if (cid) {
+        this.selectedClientId.set(cid);
+        this.accountForm.patchValue({ clientId: cid });
+        this.accountForm.get('clientId')?.disable();
+      }
+    }
+
     if (this.accountId) {
       this.isEdit = true;
       // En modo edición, algunos campos suelen ser inmutables en sistemas bancarios
