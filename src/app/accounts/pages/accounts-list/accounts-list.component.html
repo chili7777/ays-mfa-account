@@ -152,7 +152,7 @@
       </div>
 
       <div class="accounts-grid" *ngIf="!loading()">
-        <div class="account-item animate-fade-in" *ngFor="let account of filteredAccounts()" (click)="goToDetail(account.id)">
+        <div class="account-item animate-fade-in" *ngFor="let account of filteredAccounts()" (click)="goToMovements(account.id)">
           <div class="account-card-modern">
             <!-- Parte Superior -->
             <div class="card-top d-flex justify-content-between align-items-start">
@@ -193,13 +193,18 @@
             </div>
 
             <!-- Acciones rápidas flotantes o al hover (opcional para mantener limpieza) -->
-            <div class="quick-actions" *ngIf="isAdmin()">
-              <button class="btn-mini edit" (click)="$event.stopPropagation(); goToEdit(account.id)" title="Editar">
-                <span class="material-icons">edit</span>
+            <div class="quick-actions">
+              <button class="btn-mini view" (click)="$event.stopPropagation(); goToDetail(account.id)" title="Ver Detalle">
+                <span class="material-icons">visibility</span>
               </button>
-              <button class="btn-mini delete" (click)="$event.stopPropagation(); confirmDelete(account.id)" title="Eliminar">
-                <span class="material-icons">delete</span>
-              </button>
+              <ng-container *ngIf="isAdmin()">
+                <button class="btn-mini edit" (click)="$event.stopPropagation(); goToEdit(account.id)" title="Editar">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="btn-mini delete" (click)="$event.stopPropagation(); confirmDelete(account.id)" title="Eliminar">
+                  <span class="material-icons">delete</span>
+                </button>
+              </ng-container>
             </div>
           </div>
         </div>

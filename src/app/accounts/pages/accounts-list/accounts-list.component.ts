@@ -244,6 +244,13 @@ export class AccountsListComponent implements OnInit {
     }
   }
 
+  goToMovements(id: string | undefined): void {
+    if (id) {
+      // Para navegación entre Microfrontends, usamos el Bridge hacia la Shell
+      this.mfeBridge.navigateTo('/movements', { account: id });
+    }
+  }
+
   confirmDelete(id: string | undefined): void {
     if (id) {
       this.deleteId.set(id);
