@@ -29,10 +29,16 @@ export class AccountsListComponent implements OnInit {
   showDeleteModal = signal<boolean>(false);
   deleteId = signal<string>('');
   isBalancesVisible = signal<boolean>(false);
-  userRole = signal<string>((localStorage.getItem('userRole') || 'USER').trim().toUpperCase());
+  // Robustecemos la detección del rol limpiando posibles comillas o espacios y permitiendo variaciones
+  userRole = signal<string>(
+    (localStorage.getItem('userRole') || 'USER')
+      .replace(/['"]+/g, '')
+      .trim()
+      .toUpperCase()
+  );
   currentClientId = signal<string | null>(localStorage.getItem('clientId'));
 
-  isAdmin = computed(() => this.userRole() === 'ADMIN');
+  isAdmin = computed(() => this.userRole().includes('ADMIN'));
 
   filteredAccounts = computed(() => {
     let list = this.accounts();

@@ -26,8 +26,14 @@ export class AccountDetailComponent implements OnInit {
   loading = signal(true);
   errorMessage = signal<string | null>(null);
   showDeleteModal = signal(false);
-  userRole = signal<string>((localStorage.getItem('userRole') || 'USER').trim().toUpperCase());
-  isAdmin = computed(() => this.userRole() === 'ADMIN');
+  // Robustecemos la detección del rol limpiando posibles comillas o espacios y permitiendo variaciones
+  userRole = signal<string>(
+    (localStorage.getItem('userRole') || 'USER')
+      .replace(/['"]+/g, '')
+      .trim()
+      .toUpperCase()
+  );
+  isAdmin = computed(() => this.userRole().includes('ADMIN'));
   currentClientId = signal<string | null>(null);
 
   ngOnInit(): void {

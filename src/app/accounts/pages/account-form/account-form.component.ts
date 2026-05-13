@@ -32,10 +32,16 @@ export class AccountFormComponent implements OnInit {
   selectedClientId = signal<string | null>(null);
   currentStep = signal<number>(1);
   totalSteps = 3;
-  userRole = signal<string>((localStorage.getItem('userRole') || 'USER').trim().toUpperCase());
+  // Robustecemos la detección del rol limpiando posibles comillas o espacios y permitiendo variaciones
+  userRole = signal<string>(
+    (localStorage.getItem('userRole') || 'USER')
+      .replace(/['"]+/g, '')
+      .trim()
+      .toUpperCase()
+  );
   currentClientId = signal<string | null>(localStorage.getItem('clientId'));
 
-  isAdmin = computed(() => this.userRole() === 'ADMIN');
+  isAdmin = computed(() => this.userRole().includes('ADMIN'));
 
   filteredCustomers = computed(() => {
     const term = this.customerSearchTerm().toLowerCase().trim();
@@ -125,8 +131,11 @@ export class AccountFormComponent implements OnInit {
         this.selectedClientId.set(cid);
         this.accountForm.patchValue({ clientId: cid });
 
-        // Si no es ADMIN, bloqueamos el campo
-        if (!this.isAdmin()) {
+        // Si es ADMIN, aseguramos que el campo esté habilitado para permitirle cambiar el titular si lo desea
+        // Si no es ADMIN (USER), bloqueamos el campo para que solo pueda crear cuentas para sí mismo
+        if (this.isAdmin()) {
+          this.accountForm.get('clientId')?.enable();
+        } else {
           this.accountForm.get('clientId')?.disable();
         }
       }
