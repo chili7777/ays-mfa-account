@@ -23,7 +23,13 @@
 
     <section class="list-section">
       <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2">
-        <h2 class="h5 mb-0">{{ isAdmin() ? 'Gestión de Cuentas' : 'Mis Cuentas' }}</h2>
+        <div class="d-flex align-items-center gap-3">
+          <h2 class="h5 mb-0">{{ isAdmin() ? 'Gestión de Cuentas' : 'Mis Cuentas' }}</h2>
+          <span class="role-badge" [class.admin-role]="isAdmin()">
+            <span class="material-icons" style="font-size: 14px;">{{ isAdmin() ? 'admin_panel_settings' : 'person' }}</span>
+            {{ userRole() }}
+          </span>
+        </div>
         <div class="d-flex gap-2">
           <!-- Botón de Clientes: Solo para ADMIN -->
           <button *ngIf="isAdmin()" class="btn btn-outline-primary btn-sm" (click)="goToClients()" title="Gestionar Clientes">
