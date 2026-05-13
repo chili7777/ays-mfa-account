@@ -255,7 +255,7 @@ export class AccountFormComponent implements OnInit {
       this.accountService.createAccount(formValue).subscribe({
         next: () => {
           alert('Cuenta creada correctamente');
-          this.goBack();
+          this.goBack(true); // Redirección limpia para ver todas las cuentas (especialmente para ADMIN)
         },
         error: (err) => {
           console.error('Error al crear', err);
@@ -265,8 +265,12 @@ export class AccountFormComponent implements OnInit {
     }
   }
 
-  goBack(): void {
-    this.router.navigate(['/accounts'], { queryParamsHandling: 'preserve' });
+  goBack(clean: boolean = false): void {
+    if (clean) {
+      this.router.navigate(['/accounts']);
+    } else {
+      this.router.navigate(['/accounts'], { queryParamsHandling: 'preserve' });
+    }
   }
 
   nextStep(): void {

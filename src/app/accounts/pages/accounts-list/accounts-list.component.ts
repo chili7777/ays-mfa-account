@@ -32,6 +32,12 @@ export class AccountsListComponent implements OnInit {
   deleteId = signal<string>('');
   isBalancesVisible = signal<boolean>(false);
 
+  // Filtro de clientes (ADMIN)
+  selectedClientIdFilter = signal<string>('');
+  customerSearchTerm = signal<string>('');
+  showCustomerDropdown = signal<boolean>(false);
+  statusFilter = signal<'all' | 'active' | 'inactive'>('all');
+
   // Sincronización vía Bridge
   userRole = computed(() => (this.mfeBridge.sessionData().role || 'USER').toUpperCase());
   currentClientId = computed(() => this.mfeBridge.sessionData().clientId);
@@ -47,6 +53,22 @@ export class AccountsListComponent implements OnInit {
 
   isAdmin = computed(() => this.userRole().includes('ADMIN'));
 
+  dropdownCustomers = computed(() => {
+    const term = this.customerSearchTerm().toLowerCase().trim();
+    if (!term) return this.customers();
+    return this.customers().filter(c =>
+      c.name.toLowerCase().includes(term) ||
+      c.identification.toLowerCase().includes(term)
+    );
+  });
+
+  selectedCustomerName = computed(() => {
+    const id = this.selectedClientIdFilter();
+    if (!id) return 'Todos los Clientes';
+    const customer = this.customers().find(c => c.id === id);
+    return customer ? customer.name : 'Cliente Desconocido';
+  });
+
   filteredAccounts = computed(() => {
     let list = this.accounts();
 
@@ -55,6 +77,17 @@ export class AccountsListComponent implements OnInit {
     // loadAccounts ya se encargó de traer solo esas o todas.
     if (!this.isAdmin() && this.currentClientId()) {
       list = list.filter(a => a.clientId === this.currentClientId());
+    }
+
+    // Filtro ADICIONAL por cliente seleccionado en el dropdown (ADMIN)
+    if (this.isAdmin() && this.selectedClientIdFilter()) {
+      list = list.filter(a => a.clientId === this.selectedClientIdFilter());
+    }
+
+    // Filtro por estado (ADMIN)
+    if (this.isAdmin() && this.statusFilter() !== 'all') {
+      const isActive = this.statusFilter() === 'active';
+      list = list.filter(a => a.status === isActive);
     }
 
     const term = this.searchTerm().toLowerCase().trim();
@@ -72,12 +105,9 @@ export class AccountsListComponent implements OnInit {
     // Verificamos parámetros de URL para compatibilidad con navegación manual
     this.route.queryParams.subscribe(params => {
       const clientId = params['client'] || params['clientId'];
-      if (clientId && this.isAdmin()) {
-        // Si el admin quiere ver un cliente específico vía URL
-        this.accountService.getAccountsByClientId(clientId).subscribe({
-          next: (data) => this.accounts.set(data),
-          error: (err) => console.error('Error al cargar cuentas de cliente', err)
-        });
+      if (this.isAdmin()) {
+        // Seteamos el filtro (o lo limpiamos si no viene en la URL)
+        this.selectedClientIdFilter.set(clientId || '');
       }
     });
   }
@@ -163,10 +193,35 @@ export class AccountsListComponent implements OnInit {
     this.isBalancesVisible.update(v => !v);
   }
 
+  toggleCustomerDropdown(): void {
+    if (!this.isAdmin()) return;
+    this.showCustomerDropdown.update(v => !v);
+    if (this.showCustomerDropdown()) {
+      this.customerSearchTerm.set('');
+    }
+  }
+
+  selectCustomerFilter(customer: Customer): void {
+    this.selectedClientIdFilter.set(customer.id || '');
+    this.showCustomerDropdown.set(false);
+  }
+
+  clearCustomerFilter(): void {
+    this.selectedClientIdFilter.set('');
+    this.showCustomerDropdown.set(false);
+  }
+
+  clearAllFilters(): void {
+    this.selectedClientIdFilter.set('');
+    this.statusFilter.set('all');
+    this.showCustomerDropdown.set(false);
+  }
+
   goToCreate(): void {
     const queryParams: any = {};
-    if (this.currentClientId()) {
-      queryParams.client = this.currentClientId();
+    const clientId = this.isAdmin() ? this.selectedClientIdFilter() : this.currentClientId();
+    if (clientId) {
+      queryParams.client = clientId;
     }
     this.router.navigate(['/accounts/create'], { queryParams });
   }
@@ -180,8 +235,9 @@ export class AccountsListComponent implements OnInit {
   goToDetail(id: string | undefined): void {
     if (id) {
       const queryParams: any = {};
-      if (this.currentClientId()) {
-        queryParams.client = this.currentClientId();
+      const clientId = this.isAdmin() ? this.selectedClientIdFilter() : this.currentClientId();
+      if (clientId) {
+        queryParams.client = clientId;
       }
       this.router.navigate(['/accounts/detail', id], { queryParams });
     }

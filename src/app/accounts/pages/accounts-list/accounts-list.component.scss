@@ -233,3 +233,134 @@
     box-shadow: 0 0 8px var(--success-color);
   }
 }
+
+.filters-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+
+  .ls-1 {
+    letter-spacing: 1px;
+  }
+
+  .h-select {
+    background-color: rgba(30, 35, 41, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    min-height: 42px;
+    transition: all 0.2s ease;
+
+    &:focus {
+      background-color: rgba(30, 35, 41, 0.4);
+      border-color: var(--accent-color);
+      color: white;
+      box-shadow: none;
+    }
+
+    option {
+      background-color: #1e2329;
+      color: white;
+    }
+  }
+
+  label {
+    font-weight: 500;
+  }
+}
+
+.custom-select-container {
+  position: relative;
+  z-index: 1001; /* Debe ser mayor que dropdown-overlay (1000) */
+
+  .selected-value-box {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 42px;
+    background: rgba(30, 35, 41, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(30, 35, 41, 0.4);
+      border-color: var(--accent-color);
+    }
+  }
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #1e2329; /* Consistente con surface */
+  border: 1px solid rgba(43, 49, 57, 0.8);
+  border-radius: 8px;
+  margin-top: 4px;
+  z-index: 1001;
+  overflow: hidden;
+
+  .search-container {
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(43, 49, 57, 0.5);
+
+    .form-control-sm {
+      background: transparent;
+      border: none;
+      font-size: 0.85rem;
+      border-radius: 0;
+      color: white;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      &:focus {
+        background: transparent;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .options-list {
+    max-height: 250px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+
+    .option-item {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+
+      &:last-child { border-bottom: none; }
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      &.active {
+        background-color: rgba(0, 92, 230, 0.1);
+        border-left: 3px solid var(--accent-color);
+      }
+    }
+  }
+}
+
+.dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  background: transparent;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
