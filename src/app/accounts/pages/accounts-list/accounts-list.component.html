@@ -24,90 +24,99 @@
         </div>
       </div>
 
-      <!-- Sección de Filtros (ADMIN) -->
-      <div class="filters-section mt-3 p-3 animate-fade-in" *ngIf="isAdmin()">
-        <div class="d-flex align-items-center justify-content-between mb-3 text-secondary">
-          <div class="d-flex align-items-center gap-2">
-            <span class="material-icons" style="font-size: 18px;">filter_alt</span>
-            <span class="small fw-bold text-uppercase ls-1">Filtros de Administración</span>
+      <!-- Sección de Filtros Unificada (ADMIN) -->
+      <div class="mt-4" *ngIf="isAdmin()">
+        <div class="filter-group-container">
+          <div class="filter-header">
+            <div class="d-flex align-items-center gap-2">
+              <span class="material-icons" style="font-size: 18px;">tune</span>
+              <span class="small fw-bold text-uppercase ls-1">Filtros Avanzados</span>
+            </div>
+            <button *ngIf="selectedClientIdFilter() || statusFilter() !== 'all'"
+                    class="btn-clear-filters"
+                    (click)="clearAllFilters()"
+                    title="Restablecer todos los filtros">
+              <span class="material-icons">filter_alt_off</span>
+              <span>Limpiar todo</span>
+            </button>
           </div>
-          <button *ngIf="selectedClientIdFilter() || statusFilter() !== 'all'"
-                  class="btn btn-link btn-sm p-0 text-decoration-none d-flex align-items-center gap-1"
-                  (click)="clearAllFilters()"
-                  style="font-size: 0.75rem; color: var(--accent-light);">
-            <span class="material-icons" style="font-size: 14px;">filter_alt_off</span>
-            Limpiar filtros
-          </button>
-        </div>
-        <div class="row g-3">
-          <!-- Filtro por Cliente -->
-          <div class="col-12 col-md-6 col-lg-5">
-            <label class="small text-secondary mb-1 d-block">Filtrar por Titular</label>
-            <div class="custom-select-container">
-              <div class="selected-value-box d-flex align-items-center justify-content-between form-control"
-                   (click)="toggleCustomerDropdown()">
-                <div class="d-flex align-items-center gap-2 overflow-hidden">
-                  <span class="material-icons text-secondary" style="font-size: 18px;">person_search</span>
-                  <span class="text-truncate" [class.text-secondary]="!selectedClientIdFilter()">{{selectedCustomerName()}}</span>
-                </div>
-                <div class="d-flex align-items-center gap-1">
-                  <span *ngIf="selectedClientIdFilter()" class="material-icons text-danger cursor-pointer" style="font-size: 16px;" (click)="$event.stopPropagation(); clearCustomerFilter()" title="Limpiar filtro">close</span>
-                  <span class="material-icons opacity-50">{{showCustomerDropdown() ? 'expand_less' : 'expand_more'}}</span>
-                </div>
-              </div>
 
-              <!-- Dropdown Panel -->
-              <div *ngIf="showCustomerDropdown()" class="dropdown-panel shadow-lg animate-fade-in">
-                <div class="p-2 search-container">
-                  <div class="position-relative">
-                    <span class="material-icons position-absolute top-50 translate-middle-y ms-2 text-secondary" style="font-size: 18px;">search</span>
-                    <input
-                      type="text"
-                      class="form-control form-control-sm ps-5"
-                      placeholder="Buscar cliente..."
-                      [ngModel]="customerSearchTerm()"
-                      (ngModelChange)="customerSearchTerm.set($event)"
-                      (click)="$event.stopPropagation()"
-                    >
+          <div class="row g-4">
+            <!-- Filtro Cliente -->
+            <div class="col-12 col-lg-7">
+              <label class="small text-secondary mb-2 d-flex align-items-center gap-2">
+                <span class="material-icons" style="font-size: 14px;">person_search</span>
+                Filtrar por Titular
+              </label>
+              <div class="custom-select-container">
+                <div class="selected-value-box d-flex align-items-center justify-content-between form-control"
+                     (click)="toggleCustomerDropdown()">
+                  <div class="d-flex align-items-center gap-2 overflow-hidden">
+                    <span class="material-icons opacity-50" style="font-size: 18px;">person</span>
+                    <span class="text-truncate" [class.text-secondary]="!selectedClientIdFilter()">{{selectedCustomerName()}}</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-1">
+                    <span *ngIf="selectedClientIdFilter()" class="material-icons text-danger cursor-pointer" style="font-size: 16px;" (click)="$event.stopPropagation(); clearCustomerFilter()" title="Limpiar filtro">close</span>
+                    <span class="material-icons opacity-50">{{showCustomerDropdown() ? 'expand_less' : 'expand_more'}}</span>
                   </div>
                 </div>
 
-                <div class="options-list">
-                  <div class="option-item p-2 px-3" (click)="clearCustomerFilter()">
-                    <span class="fw-medium text-primary">Todos los Clientes</span>
-                  </div>
-                  <div
-                    *ngFor="let customer of dropdownCustomers()"
-                    class="option-item p-2 px-3"
-                    (click)="selectCustomerFilter(customer); $event.stopPropagation()"
-                    [class.active]="selectedClientIdFilter() === customer.id"
-                  >
-                    <div class="d-flex flex-column pointer-events-none">
-                      <span class="fw-medium text-truncate">{{customer.name}}</span>
-                      <span class="text-secondary small opacity-75">{{customer.identification}}</span>
+                <!-- Dropdown Panel -->
+                <div *ngIf="showCustomerDropdown()" class="dropdown-panel shadow-lg animate-fade-in">
+                  <div class="p-2 search-container">
+                    <div class="position-relative">
+                      <span class="material-icons position-absolute top-50 translate-middle-y ms-2 text-secondary" style="font-size: 18px;">search</span>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm ps-5"
+                        placeholder="Buscar cliente..."
+                        [ngModel]="customerSearchTerm()"
+                        (ngModelChange)="customerSearchTerm.set($event)"
+                        (click)="$event.stopPropagation()"
+                      >
                     </div>
                   </div>
 
-                  <div *ngIf="dropdownCustomers().length === 0" class="p-3 text-center text-secondary small">
-                    No se encontraron clientes
+                  <div class="options-list">
+                    <div class="option-item p-2 px-3" (click)="clearCustomerFilter()">
+                      <span class="fw-medium text-primary">Todos los Clientes</span>
+                    </div>
+                    <div
+                      *ngFor="let customer of dropdownCustomers()"
+                      class="option-item p-2 px-3"
+                      (click)="selectCustomerFilter(customer); $event.stopPropagation()"
+                      [class.active]="selectedClientIdFilter() === customer.id"
+                    >
+                      <div class="d-flex flex-column pointer-events-none">
+                        <span class="fw-medium text-truncate">{{customer.name}}</span>
+                        <span class="text-secondary small opacity-75">{{customer.identification}}</span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="dropdownCustomers().length === 0" class="p-3 text-center text-secondary small">
+                      No se encontraron clientes
+                    </div>
                   </div>
                 </div>
               </div>
+              <!-- Overlay para cerrar al hacer click fuera -->
+              <div *ngIf="showCustomerDropdown()" class="dropdown-overlay" (click)="showCustomerDropdown.set(false)"></div>
             </div>
-            <!-- Overlay para cerrar al hacer click fuera -->
-            <div *ngIf="showCustomerDropdown()" class="dropdown-overlay" (click)="showCustomerDropdown.set(false)"></div>
-          </div>
 
-          <!-- Filtro por Estado -->
-          <div class="col-12 col-md-6 col-lg-3">
-            <label class="small text-secondary mb-1 d-block">Estado de Cuenta</label>
-            <div class="position-relative">
-              <span class="material-icons position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary" style="font-size: 18px;">toggle_on</span>
-              <select class="form-select form-select-sm h-select ps-5" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
-                <option value="all">Todos los estados</option>
-                <option value="active">Solo Activos</option>
-                <option value="inactive">Solo Inactivos</option>
-              </select>
+            <!-- Filtro Estado -->
+            <div class="col-12 col-lg-5">
+              <label class="small text-secondary mb-2 d-flex align-items-center gap-2">
+                <span class="material-icons" style="font-size: 14px;">toggle_on</span>
+                Estado de Cuenta
+              </label>
+              <div class="position-relative">
+                <span class="material-icons position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary" style="font-size: 18px;">filter_list</span>
+                <select class="form-select form-select-sm h-select ps-5" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+                  <option value="all">Todos los estados</option>
+                  <option value="active">Solo Activos</option>
+                  <option value="inactive">Solo Inactivos</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>

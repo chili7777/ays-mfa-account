@@ -234,20 +234,42 @@
   }
 }
 
-.filters-section {
+.filter-group-container {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  border-radius: 16px; // Un poco más redondeado para suavizar
+  transition: all 0.3s ease;
+  padding: 1.5rem !important;
+
+  @media (min-width: 768px) {
+    padding: 2rem !important;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    min-height: 32px;
+    color: var(--text-secondary);
+  }
 
   .ls-1 {
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
   }
 
   .h-select {
     background-color: rgba(30, 35, 41, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text-secondary);
-    min-height: 42px;
+    min-height: 48px;
+    padding-left: 3rem !important;
+    border-radius: 12px;
     transition: all 0.2s ease;
 
     &:focus {
@@ -275,9 +297,11 @@
   .selected-value-box {
     cursor: pointer;
     transition: all 0.2s ease;
-    min-height: 42px;
+    min-height: 48px;
+    border-radius: 12px;
     background: rgba(30, 35, 41, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0 1.25rem;
 
     &:hover {
       background: rgba(30, 35, 41, 0.4);
@@ -359,6 +383,36 @@
   height: 100vh;
   z-index: 1000;
   background: transparent;
+}
+
+.btn-clear-filters {
+  background: rgba(88, 166, 255, 0.1);
+  color: var(--accent-light);
+  border: 1px solid rgba(88, 166, 255, 0.2);
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(88, 166, 255, 0.2);
+    border-color: var(--accent-light);
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  .material-icons {
+    font-size: 14px;
+  }
 }
 
 .cursor-pointer {
