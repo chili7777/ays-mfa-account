@@ -12,7 +12,10 @@
         </div>
       </div>
       <div class="text-center">
-        <h1 class="h3 mb-2 fw-bold">{{isEdit ? 'Actualizar Cuenta' : 'Apertura de Cuenta'}}</h1>
+        <h1 class="h3 mb-2 fw-bold">
+          {{isEdit ? 'Actualizar Cuenta' : 'Apertura de Cuenta'}}
+          <span class="text-secondary small ms-2" style="font-size: 14px; opacity: 0.7; font-weight: 400;">({{ userRole() }})</span>
+        </h1>
         <p class="text-secondary px-4">
           {{
             currentStep() === 1 ? 'Paso 1: Vínculo con Cliente' :

@@ -13,7 +13,10 @@
         </div>
       </div>
       <div class="text-center">
-        <h1 class="h3 mb-2 fw-bold">Detalle de Cuenta</h1>
+        <h1 class="h3 mb-2 fw-bold">
+          Detalle de Cuenta
+          <span class="text-secondary small ms-2" style="font-size: 14px; opacity: 0.7; font-weight: 400;">({{ userRole() }})</span>
+        </h1>
         <p class="text-secondary px-4 mb-3">
           {{ account()?.accountNumber || 'Información detallada' }}
         </p>

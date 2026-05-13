@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -7,6 +7,7 @@ import { MovementService } from '../../services/movement.service';
 import { CustomerService } from '../../services/customer.service';
 import { Account } from '../../interfaces/account.interface';
 import { Customer } from '../../interfaces/customer.interface';
+import { MfeBridgeService } from '../../../core/services/mfe-bridge.service';
 
 @Component({
   selector: 'app-accounts-list',
@@ -21,6 +22,7 @@ export class AccountsListComponent implements OnInit {
   private readonly accountService = inject(AccountService);
   private readonly movementService = inject(MovementService);
   private readonly customerService = inject(CustomerService);
+  private readonly mfeBridge = inject(MfeBridgeService);
 
   accounts = signal<Account[]>([]);
   customers = signal<Customer[]>([]);
@@ -29,14 +31,19 @@ export class AccountsListComponent implements OnInit {
   showDeleteModal = signal<boolean>(false);
   deleteId = signal<string>('');
   isBalancesVisible = signal<boolean>(false);
-  // Robustecemos la detección del rol limpiando posibles comillas o espacios y permitiendo variaciones
-  userRole = signal<string>(
-    (localStorage.getItem('userRole') || 'USER')
-      .replace(/['"]+/g, '')
-      .trim()
-      .toUpperCase()
-  );
-  currentClientId = signal<string | null>(localStorage.getItem('clientId'));
+
+  // Sincronización vía Bridge
+  userRole = computed(() => (this.mfeBridge.sessionData().role || 'USER').toUpperCase());
+  currentClientId = computed(() => this.mfeBridge.sessionData().clientId);
+
+  constructor() {
+    effect(() => {
+      // Recargar datos cuando cambie el clientId sincronizado
+      if (this.currentClientId()) {
+        this.loadAccounts();
+      }
+    });
+  }
 
   isAdmin = computed(() => this.userRole().includes('ADMIN'));
 
@@ -59,19 +66,7 @@ export class AccountsListComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const cid = params['clientId'] || params['client'];
-      if (cid) {
-        this.currentClientId.set(cid);
-      } else {
-        // Si no viene por query param, intentar de localStorage
-        this.currentClientId.set(localStorage.getItem('clientId'));
-      }
-
-      // Cargar cuentas después de tener el clientId
-      this.loadAccounts();
-    });
-
+    // La carga de cuentas se maneja por el effect del currentClientId
     this.loadCustomers();
   }
 

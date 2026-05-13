@@ -6,6 +6,7 @@ import { AccountService } from '../../services/account.service';
 import { CustomerService } from '../../services/customer.service';
 import { MovementService } from '../../services/movement.service';
 import { Customer } from '../../interfaces/customer.interface';
+import { MfeBridgeService } from '../../../core/services/mfe-bridge.service';
 
 @Component({
   selector: 'app-account-form',
@@ -21,6 +22,7 @@ export class AccountFormComponent implements OnInit {
   private readonly accountService = inject(AccountService);
   private readonly customerService = inject(CustomerService);
   private readonly movementService = inject(MovementService);
+  private readonly mfeBridge = inject(MfeBridgeService);
 
   accountForm: FormGroup;
   isEdit = false;
@@ -32,14 +34,10 @@ export class AccountFormComponent implements OnInit {
   selectedClientId = signal<string | null>(null);
   currentStep = signal<number>(1);
   totalSteps = 3;
-  // Robustecemos la detección del rol limpiando posibles comillas o espacios y permitiendo variaciones
-  userRole = signal<string>(
-    (localStorage.getItem('userRole') || 'USER')
-      .replace(/['"]+/g, '')
-      .trim()
-      .toUpperCase()
-  );
-  currentClientId = signal<string | null>(localStorage.getItem('clientId'));
+
+  // Datos sincronizados desde el Bridge
+  userRole = computed(() => (this.mfeBridge.sessionData().role || 'USER').toUpperCase());
+  currentClientId = computed(() => this.mfeBridge.sessionData().clientId);
 
   isAdmin = computed(() => this.userRole().includes('ADMIN'));
 
@@ -268,7 +266,7 @@ export class AccountFormComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/accounts']);
+    this.router.navigate(['/accounts'], { queryParamsHandling: 'preserve' });
   }
 
   nextStep(): void {

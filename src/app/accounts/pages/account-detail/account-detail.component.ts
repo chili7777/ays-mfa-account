@@ -6,6 +6,7 @@ import { MovementService } from '../../services/movement.service';
 import { CustomerService } from '../../services/customer.service';
 import { Account } from '../../interfaces/account.interface';
 import { Customer } from '../../interfaces/customer.interface';
+import { MfeBridgeService } from '../../../core/services/mfe-bridge.service';
 
 @Component({
   selector: 'app-account-detail',
@@ -20,30 +21,20 @@ export class AccountDetailComponent implements OnInit {
   private readonly accountService = inject(AccountService);
   private readonly movementService = inject(MovementService);
   private readonly customerService = inject(CustomerService);
+  private readonly mfeBridge = inject(MfeBridgeService);
 
   account = signal<Account | null>(null);
   customer = signal<Customer | null>(null);
   loading = signal(true);
   errorMessage = signal<string | null>(null);
   showDeleteModal = signal(false);
-  // Robustecemos la detección del rol limpiando posibles comillas o espacios y permitiendo variaciones
-  userRole = signal<string>(
-    (localStorage.getItem('userRole') || 'USER')
-      .replace(/['"]+/g, '')
-      .trim()
-      .toUpperCase()
-  );
+
+  // Datos sincronizados desde el Bridge
+  userRole = computed(() => (this.mfeBridge.sessionData().role || 'USER').toUpperCase());
   isAdmin = computed(() => this.userRole().includes('ADMIN'));
-  currentClientId = signal<string | null>(null);
+  currentClientId = computed(() => this.mfeBridge.sessionData().clientId);
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const cid = params['clientId'] || params['client'];
-      if (cid) {
-        this.currentClientId.set(cid);
-      }
-    });
-
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadAccount(id);
@@ -167,10 +158,6 @@ export class AccountDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    const queryParams: any = {};
-    if (this.currentClientId()) {
-      queryParams.client = this.currentClientId();
-    }
-    this.router.navigate(['/accounts'], { queryParams });
+    this.router.navigate(['/accounts'], { queryParamsHandling: 'preserve' });
   }
 }
