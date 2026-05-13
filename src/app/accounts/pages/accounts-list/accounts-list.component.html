@@ -23,8 +23,8 @@
 
     <section class="list-section">
       <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2">
-        <h2 class="h5 mb-0">Mis Cuentas</h2>
-        <button class="btn btn-success btn-sm" (click)="goToCreate()">
+        <h2 class="h5 mb-0">{{ userRole() === 'ADMIN' ? 'Gestión de Cuentas' : 'Mis Cuentas' }}</h2>
+        <button *ngIf="userRole() === 'ADMIN'" class="btn btn-success btn-sm" (click)="goToCreate()">
           <span class="material-icons d-md-none" style="font-size: 18px;">add</span>
           <span class="d-none d-md-inline">+ Nueva Cuenta</span>
         </button>
@@ -70,8 +70,9 @@
               <div class="card-actions-row d-flex align-items-center gap-2 gap-md-3">
                 <div class="status-indicator"
                      [class.active-status]="account.status"
-                     (click)="$event.stopPropagation(); toggleStatus(account)"
-                     [title]="account.status ? 'Haga clic para desactivar' : 'Haga clic para activar'">
+                     [class.no-click]="userRole() !== 'ADMIN'"
+                     (click)="onStatusClick($event, account)"
+                     [title]="userRole() === 'ADMIN' ? (account.status ? 'Haga clic para desactivar' : 'Haga clic para activar') : ''">
                    <span [class]="account.status ? 'status-dot active' : 'status-dot'"></span>
                    <span class="status-text ms-1">
                      {{ account.status ? 'Activo' : 'Inactivo' }}
@@ -81,7 +82,7 @@
             </div>
 
             <!-- Acciones rápidas flotantes o al hover (opcional para mantener limpieza) -->
-            <div class="quick-actions">
+            <div class="quick-actions" *ngIf="userRole() === 'ADMIN'">
               <button class="btn-mini edit" (click)="$event.stopPropagation(); goToEdit(account.id)" title="Editar">
                 <span class="material-icons">edit</span>
               </button>

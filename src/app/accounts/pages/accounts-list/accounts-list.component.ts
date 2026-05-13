@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AccountService } from '../../services/account.service';
 import { MovementService } from '../../services/movement.service';
 import { CustomerService } from '../../services/customer.service';
@@ -17,6 +17,7 @@ import { Customer } from '../../interfaces/customer.interface';
 })
 export class AccountsListComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly accountService = inject(AccountService);
   private readonly movementService = inject(MovementService);
   private readonly customerService = inject(CustomerService);
@@ -28,12 +29,21 @@ export class AccountsListComponent implements OnInit {
   showDeleteModal = signal<boolean>(false);
   deleteId = signal<string>('');
   isBalancesVisible = signal<boolean>(false);
+  userRole = signal<string>(localStorage.getItem('userRole') || 'USER');
+  currentClientId = signal<string | null>(null);
 
   filteredAccounts = computed(() => {
-    const term = this.searchTerm().toLowerCase().trim();
-    if (!term) return this.accounts();
+    let list = this.accounts();
 
-    return this.accounts().filter(a =>
+    // Filtro por rol y clientId
+    if (this.userRole() !== 'ADMIN' && this.currentClientId()) {
+      list = list.filter(a => a.clientId === this.currentClientId());
+    }
+
+    const term = this.searchTerm().toLowerCase().trim();
+    if (!term) return list;
+
+    return list.filter(a =>
       (a.accountNumber?.toLowerCase().includes(term)) ||
       (a.accountType?.toLowerCase().includes(term)) ||
       (this.getCustomerName(a.clientId).toLowerCase().includes(term))
@@ -41,6 +51,16 @@ export class AccountsListComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const cid = params['clientId'] || params['client'];
+      if (cid) {
+        this.currentClientId.set(cid);
+      } else {
+        // Si no viene por query param, intentar de localStorage
+        this.currentClientId.set(localStorage.getItem('clientId'));
+      }
+    });
+
     this.loadCustomers();
     this.loadAccounts();
   }
@@ -85,6 +105,13 @@ export class AccountsListComponent implements OnInit {
 
   onSearch(): void {
     // La búsqueda es reactiva a través del computed filteredAccounts
+  }
+
+  onStatusClick(event: MouseEvent, account: Account): void {
+    event.stopPropagation();
+    if (this.userRole() === 'ADMIN') {
+      this.toggleStatus(account);
+    }
   }
 
   toggleStatus(account: Account): void {
