@@ -38,8 +38,8 @@ export class AccountsListComponent implements OnInit {
 
   constructor() {
     effect(() => {
-      // Recargar datos cuando cambie el clientId sincronizado
-      if (this.currentClientId()) {
+      // Recargar datos cuando cambie el rol o el clientId sincronizado
+      if (this.userRole()) {
         this.loadAccounts();
       }
     });
@@ -50,7 +50,9 @@ export class AccountsListComponent implements OnInit {
   filteredAccounts = computed(() => {
     let list = this.accounts();
 
-    // Filtro por rol y clientId
+    // Filtro por rol y clientId: El USER solo ve sus cuentas
+    // El ADMIN ve todo, pero si viene un clientId externo (vía queryParam),
+    // loadAccounts ya se encargó de traer solo esas o todas.
     if (!this.isAdmin() && this.currentClientId()) {
       list = list.filter(a => a.clientId === this.currentClientId());
     }
@@ -66,8 +68,18 @@ export class AccountsListComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // La carga de cuentas se maneja por el effect del currentClientId
     this.loadCustomers();
+    // Verificamos parámetros de URL para compatibilidad con navegación manual
+    this.route.queryParams.subscribe(params => {
+      const clientId = params['client'] || params['clientId'];
+      if (clientId && this.isAdmin()) {
+        // Si el admin quiere ver un cliente específico vía URL
+        this.accountService.getAccountsByClientId(clientId).subscribe({
+          next: (data) => this.accounts.set(data),
+          error: (err) => console.error('Error al cargar cuentas de cliente', err)
+        });
+      }
+    });
   }
 
   loadCustomers(): void {
@@ -96,11 +108,16 @@ export class AccountsListComponent implements OnInit {
 
   loadAccounts(): void {
     this.loading.set(true);
+
+    // Lógica de carga basada en rol
+    // Si es ADMIN, cargamos todas las cuentas por defecto
+    // Si es USER, cargamos por su clientId
+    const isAdmin = this.isAdmin();
     const clientId = this.currentClientId();
 
-    const obs$ = (clientId)
-      ? this.accountService.getAccountsByClientId(clientId)
-      : this.accountService.getAllAccounts();
+    const obs$ = (isAdmin)
+      ? this.accountService.getAllAccounts()
+      : (clientId ? this.accountService.getAccountsByClientId(clientId) : this.accountService.getAllAccounts());
 
     obs$.subscribe({
       next: (data) => {
@@ -168,10 +185,6 @@ export class AccountsListComponent implements OnInit {
       }
       this.router.navigate(['/accounts/detail', id], { queryParams });
     }
-  }
-
-  goToClients(): void {
-    this.router.navigate(['/clients']);
   }
 
   confirmDelete(id: string | undefined): void {

@@ -31,12 +31,6 @@
           </span>
         </div>
         <div class="d-flex gap-2">
-          <!-- Botón de Clientes: Solo para ADMIN -->
-          <button *ngIf="isAdmin()" class="btn btn-outline-primary btn-sm" (click)="goToClients()" title="Gestionar Clientes">
-            <span class="material-icons d-md-none" style="font-size: 20px;">person_add</span>
-            <span class="d-none d-md-inline">+ Clientes</span>
-          </button>
-
           <!-- Botón de Nueva Cuenta: Para ADMIN y USER -->
           <button class="btn btn-success btn-sm" (click)="goToCreate()" title="Aperturar nueva cuenta">
             <span class="material-icons d-md-none" style="font-size: 20px;">add_card</span>
