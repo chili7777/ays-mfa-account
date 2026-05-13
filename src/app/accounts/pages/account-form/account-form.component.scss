@@ -47,13 +47,12 @@
   top: 100%;
   left: 0;
   right: 0;
-  background-color: #1e2329;
-  border: 1px solid rgba(43, 49, 57, 0.8);
-  border-radius: 12px;
-  margin-top: 8px;
+  background-color: #1e2329; /* Consistente con surface */
+  border: 1px solid rgba(43, 49, 57, 0.5);
+  border-radius: 8px;
+  margin-top: 4px;
   z-index: 1001;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 
   .search-container {
     background: rgba(0, 0, 0, 0.1);
@@ -124,12 +123,8 @@
 }
 
 .warning-message {
-  background: rgba(240, 185, 11, 0.08);
-  padding: 12px 16px;
-  border-radius: 12px;
-  border-left: 4px solid var(--warning-color);
-}
-
-.rounded-20 {
-  border-radius: 20px !important;
+  background: rgba(255, 193, 7, 0.05);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #ffc107;
 }
